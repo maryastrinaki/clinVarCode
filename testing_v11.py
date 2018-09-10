@@ -10,7 +10,7 @@ Keep on!
 '''
 
 class ClinVarHandler( xml.sax.ContentHandler):
-	print("hallo")
+
 
 	
 
@@ -137,6 +137,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.parentflagExample=""
 		self.text_content=[]
 		self.inside_text_tag = False
+		self.idXREFtrait=[]
+		self.dbXREFtrait=[]
+		self.exampleFuck=[]
         
 
 		
@@ -155,7 +158,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		#header = ['ChromoSome','assembly','displayStart','displayStop','outerStart','outerStop','innerstart','innerstop','start','stop','significance','DateLastEvaluatedSignificance','TraitSetType','TraitSetId','TraitType','TraitId']
 	#	header = ['clinVarSetId','Record Status','Title','Accession','ChromoSome','assembly','assemblyStatus','Strand','variantLength','displayStart','displayStop','outerStart','outerStop','innerstart','innerstop','start','stop','clinical significance','Date for signiFicance','ReviewStatus','Origin','collection Method','Submission Accession','MeasureType','allele Id','Variant type','Cytogenetic Location','title and condition','general information-Submitter','Last Updated','type of consequance(change)','Content of consequence','Type of gene relationship','HGVS']
 		
-		header=['clinical significance(clinvar)','review status(clinVar)','Record Status(clinVar)','Evaluated Date(clinVar)','Origin(clinVar)','Accession(clinVar)','ID clinVar','Variant type','chromosome','Assembly','Assembly Status','Strand','variantLength','displayStart','displayStop','outerStart','outerStop','innerstart','innerstop','start','stop','referenceAllele','alternateAllele','positionVCF','referenceAlleleVCF','alternateAlleleVCF','Cytogenetic location','HGVS','Molecular Consequence','clinical significance','Review Status','Record Status','Evaluate Date','submission Accession','Origin','Date of Submission','Method','Title']
+		header=['clinical significance(clinvar)','review status(clinVar)','Record Status(clinVar)','Evaluated Date(clinVar)','Origin(clinVar)','Accession(clinVar)','ID clinVar','Variant type','chromosome','Assembly','Assembly Status','Strand','variantLength','displayStart','displayStop','outerStart','outerStop','innerstart','innerstop','start','stop','referenceAllele','alternateAllele','positionVCF','referenceAlleleVCF','alternateAlleleVCF','Cytogenetic location','HGVS','Molecular Consequence','clinical significance','Review Status','Record Status','Evaluate Date','submission Accession','Origin','Date of Submission','Method','Title','Condition(s)']
 		header_line=','.join(header)
 		self.output_file.write(header_line+'\n')
 
@@ -187,6 +190,10 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childattributeHGVS=[]
 			self.childattributeMconsequence=[]
 			self.childProteinChange=[]
+			self.text_content=[]
+			self.idXREFtrait=[]
+			self.dbXREFtrait=[]
+
 
 
 		
@@ -250,14 +257,24 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 		if tag=="XRef":
-			#print("***new XRef***")
 			self.id_XRef= attributes.get("ID")
 			self.db_XRef=attributes.get("DB")
-			#print("id of XRef:",id_XRef , "db of xref:" , db_XRef)
+
+			
+
+
+		
+
+			
+		
+		
+			
 
 
 
 		if tag=="MeasureRelationship":
+
+			
 
 
 			if attributes.get("Type") is not None:
@@ -271,6 +288,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			elif attributes.get("Type") is None:
 
 				self.MeasureRelationshipType='Nan'
+
+
+			
 
 
 
@@ -434,38 +454,6 @@ class ClinVarHandler( xml.sax.ContentHandler):
 					self.alterAlleleVCF=attributes.get("alternateAlleleVCF")
 
 
-
-
-
-
-
-
-
-	
-
-
-
-
-				#data =[ self.ClinaVarsetID,self.RecordStatuschild,self.childlist_title,self.Accession,self.ChromoSome0,self.assembly,self.AssemblyStatus,self.strand,self.variantLength,self.displayStart,self.displayStop,self.outerStart,self.outerStop,self.innerstart,self.innerstop,self.start,self.stop,self.childlist,self.DateLastEvaluatedSignificance,self.childReviewStatus,self.childlist_Origin,self.childlist_MethodType,self.SubmissionAccession,self.MeasureType,self.MeasureId,self.variationId,self.variationType,self.CytogeneticLocationchild,self.localKeySub,self.submitterSub,self.submitterDateSub,self.specificattributeType,self.childlist2,self.MeasureRelationshipType,self.childHGVS]
-				
-				#data =[ self.ClinaVarsetID,self.RecordStatuschild,self.childlist_title,self.Accession,self.ChromoSome0,self.assembly,self.AssemblyStatus,self.strand,self.variantLength,self.displayStart,self.displayStop,self.outerStart,self.outerStop,self.innerstart,self.innerstop,self.start,self.stop]
-
-				#data =[ self.ClinaVarsetID,self.RecordStatuschild,self.RCV,self.SCV]
-
-
-				#data =[self.ClinaVarsetID,self.RCV,self.SCV]
-
-				#data_line=','.join(map(str, data))
-
-				#self.output_file.write(data_line+'\n')	
-
-				  
-
-				
-
-
-
-
 		
 
 
@@ -487,12 +475,13 @@ class ClinVarHandler( xml.sax.ContentHandler):
 				self.TraiSetTypeId= attributes.get('ID')
 
 
+			
 
 
 
-			#print("TraitSet",TraitSetType)
 
-			#print("#################################")
+
+
 
 		if tag=="Trait":
 
@@ -505,6 +494,21 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			elif attributes.get('ID') is not None :
 
 				self.TraitId= attributes.get('ID')
+
+
+			
+
+
+
+
+
+
+			
+
+			
+
+
+
 
 
 
@@ -578,8 +582,6 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-			#print(self.childattribute)
-		
 
 
 
@@ -588,7 +590,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-						#edwwwww xaliaaaaa	
+					
 		if tag=="ClinVarAccession" and attributes.get("Type")=="RCV":
 
 			
@@ -625,7 +627,23 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		if tag == 'Trait':
 			self.inside_text_tag = True
-			print(+self.inside_text_tag)
+			
+
+			
+
+
+
+
+
+
+
+
+			
+			
+			
+
+			
+		
 
 
 
@@ -636,6 +654,13 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 			if attributes.get('Type')=="Preferred":
 				self.exampleElement=self.ElementValue
+
+
+
+
+			
+			
+			
 
 
 		
@@ -741,145 +766,31 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			#if self.clinVarAccession=="SCV" and self.ClinVarAccession is not None:
 
 			#	self.SubmissionAccession=self.ClinVarAccession
-
-				
-
-
-
-
-
-
-
-			
-
-
-			
-
-
-
-
-
-
-
-
-			
-#auto paizei ia xara
-
-			#if self.clinVarAccession=="RCV":
-				
-			#	self.Accession=self.ClinVarAccession
-
-
-			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		
-
-
-
-
-
-
-
-
-		#data =[ self.ChromoSome0,self.assembly,self.displayStart,self.displayStop,self.outerStart,self.outerStop,self.innerstart,self.innerstop,self.start,self.stop,self.childlist,self.DateLastEvaluatedSignificance,self.TraitSetType,self.TraiSetTypeId,self.TraitType,self.TraitId ]
 
 		
  
 
 	def endElement (self,tag):
 
+		#print ("Element end: %s" % tag)
+
 		if tag == 'Trait':
 			self.inside_text_tag = False
-			self.text = ''.join(self.text_content)
-			print ("hallo world",self.text)
-			#edw stamatisa
-
-
-
-		#if tag=="Attribute":
-
-
-
-
-		#	self.attributeType=attributes.get('Type')
-
-		#	if self.attributeType=="MolecularConsequence":
-
-			#	self.childattribute=self.attribute
-
-			#elif self.attributeType!="MolecularConsequence":
-
-				#self.childattribute="Nan molecular consequence"
-
-			#if self.attributeType=="HGVS":
-
-				#self.childattributeHGVS=self.attribute
-
 			
 
-		#	print(self.ClinaVarsetID+' '+self.childattributeHGVS)
-
-
-
-
-
-
-
-
-		
-
-
-		
+			
 
 
 
 
 			
 
-#auto provlima
-
-		#if tag=="AttributeSet":
-
-		#	self.parentflag2=False
-
-		#	self.childlist2=self.attribute
-
-		#	if self.attributeType=='HGVS':
-
-		#		self.childHGVS=self.childlist2
-
-
-				
-
-
-
-		#if tag == "Name":
-
-		#	self.parentflag3 = False
-
-		#	self.childlist4=self.ElementValue
+			
 
 		
+			
+			
 
 		
 
@@ -890,94 +801,17 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.parentflag = False
 
 			self.childlist3=self.RecordStatuschild
+			
+			
+
 
 
 
 
 		if tag=="Name":
 			self.exampleName=self.exampleElement
-			print(self.exampleName)
-
-
-
-
 		
 
-
-		
-
-
-
-
-
-
-
-
-
-
-
-		
-				
-
-
-
-
-		
-
-			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
-
-
-
-
-
-
-			
-
-
-
-
-
-
-
-
-
-		
-
-			
-
-
-
-
-				
-				#print("Molecular Consequence",self.childlist2)
-
-
-
-
-
-		
-
-
-
-		
 
 
 
@@ -1036,7 +870,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		if tag=="SequenceLocation":
 
-			#print ("Element end: %s" % tag)
+		
 
 			
 
@@ -1058,6 +892,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childpositionAlleleVCF=self.positionAlleleVCF
 			self.childrefAlleleVCF=self.refAlleleVCF
 			self.childalterAlleleVCF=self.alterAlleleVCF
+
+			
 
 
 			
@@ -1081,62 +917,6 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 			self.output_file.write('\n')
 		
-
-
-
-		#if tag=="ClinicalSignificance":
-
-		#	if self.DateLastEvaluatedSignificance is not None:
-
-		#		self.output_file.write(self.DateLastEvaluatedSignificance+',')
-		#	elif self.DateLastEvaluatedSignificance is None:
-				#self.output_file.write('Nan Date'+',')
-
-				
-
-	
-			
-
-		
-
-		
-
-		#if tag=="ReviewStatus":
-
-		#	self.output_file.write(' \n')
-		#	self.childReviewStatus=self.childReviewStatus
-		#	self.output_file.write(self.childReviewStatus+',')
-		#	self.output_file.write('-----')
-
-
-
-		#if tag == "ClinicalSignificance":
-
-
-		#	self.childlistClinical=self.childlist
-
-		#	self.output_file.write(self.childlistClinical+',')
-
-
-		#if tag=="ClinVarSubmissionID":
-			
-		#	self.output_file.write(self.submitterSub+',')
-		#	if self.submitterDateSub is not None:
-		#		self.output_file.write(self.submitterDateSub+',')
-
-		#	elif self.submitterDateSub is  None:
-		#		self.output_file.write('Nan Date'+',')
-
-
-
-		#if tag=="Origin":
-
-		#	self.output_file.write(self.childlist_Origin+',')
-
-
-		#if tag=="MethodType":
-			
-		#	self.output_file.write(self.childlist_MethodType+',')
 
 
 
@@ -1287,7 +1067,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.output_file.write(str(self.exampleOrigin)+',')
 			self.output_file.write(str(self.examplesubmitterSub)+',')
 			self.output_file.write(str(self.examplesubmitterDateSub)+',')
-			self.output_file.write(str(	self.exampleMethod)+',')
+			self.output_file.write(str(self.exampleMethod)+',')
 		
 
 			self.output_file.write(' ')
@@ -1297,74 +1077,26 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			data_line=','.join(map(str, data))
 			self.output_file.write(data_line+',')
 
+			self.text_content = [i.split("\n") for i in self.text_content]
 
+			self.text_content = [j for i in self.text_content for j in i]
 
+			self.text_content=[x.strip() for x in self.text_content if x.strip()]
 
+			self.text_content = list(set(self.text_content))
+			self.output_file.write(str(self.text_content)+',')
 
-	
-
-			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-						
-
-
-
-			
-
-
-
-
-
-
-			#data2 =[self.ClinaVarsetID,self.RecordStatuschild,self.childlist_title,self.childlist,self.childReviewStatus,self.RCV,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop]
-
-			
-			#data_line=','.join(map(str, self.data))
-
-			#self.output_file.write(data_line+'\n')	
-
+		
 
 		
 
 
 
-		
+			
 
 			
 
-
-
-		
 			
-
-
-
-
-
-
-
-
-
-
-
-
-			
-
 
 
 
@@ -1376,16 +1108,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 			
+
+
 			
-
-		#if self.CurrentData=="Citation":
-		#	print("@@@@new Citation@@@@")
-
-		
-
-		#if self.CurrentData=="ClinVarSubmissionID ":
-		#	print("***Submission things",self.ClinVarSubmissionID)
-
 
 
 
@@ -1414,6 +1139,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		if self.CurrentData=="XRef":
 
 			self.XRef =content
+			
 
 		if self.CurrentData=="SequenceLocation":
 
@@ -1432,6 +1158,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		if self.CurrentData=="Trait":
 			self.Trait=content
+
+
 
 		if self.CurrentData=="Citation":
 			self.Citation=content
@@ -1496,82 +1224,15 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		if self.inside_text_tag:
 			self.text_content.append(content)
 
-
-
-	
-
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
+			
 			
 
 
 
-
-
-
-
-
 	
-
-
-
-
-
-
-
-
-
-	
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
 
 		
 
-
-
-
-
-	
-	
-
-
-	
 
 
 		
@@ -1581,7 +1242,7 @@ if( __name__ =="__main__"):
 	parser = xml.sax.make_parser()
 	# turn off namepsaces
 	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-	Handler=ClinVarHandler("skata.csv")
+	Handler=ClinVarHandler("epameinondas.csv")
 
 	parser.setContentHandler(Handler)
 	
