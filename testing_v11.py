@@ -4,7 +4,10 @@ import datetime
 import gzip
 import csv
 
-
+'''
+Very well done!
+Keep on!
+'''
 
 class ClinVarHandler( xml.sax.ContentHandler):
 
