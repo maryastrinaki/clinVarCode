@@ -807,7 +807,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		if tag == 'Trait':
 			self.inside_text_tag = False
 			self.text = ''.join(self.text_content)
-			print (self.text)
+			print ("hallo world",self.text)
 			#edw stamatisa
 
 
