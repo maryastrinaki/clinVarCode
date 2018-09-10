@@ -10,6 +10,7 @@ Keep on!
 '''
 
 class ClinVarHandler( xml.sax.ContentHandler):
+	print("hallo")
 
 	
 
