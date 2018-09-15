@@ -32,7 +32,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.parentflag2=False
 		self.childlist=""
 		self.childlist2=""
-		self.childReviewStatus=""
+		self.childReviewStatus=[]
 		self.text=""
 		self.childlist_title=""
 
@@ -58,7 +58,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.variationType=""
 		self.variationId=""
 		self.RecordStatus=""
-		self.RecordStatuschild=""
+		self.RecordStatuschild=[]
 		self.MeasureChild=""
 		self.CytogeneticLocation=""
 		self.CytogeneticLocationchild=""
@@ -140,8 +140,25 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.idXREFtrait=[]
 		self.dbXREFtrait=[]
 		self.exampleFuck=[]
-        
-
+		self.relations=[]
+		self.parentnameflag=False
+		self.XrefName=[]
+		self.XrefNamedb=[]
+		self.chiltrait=[]
+		self.childlist3trait=[]
+		self.Refparentflag=False
+		self.parentflagclinical = False
+		self.ClinVarparentflag=False
+		self.RecordStatuschildclinvar=[]
+		self.childReviewStatuclinvars=[]
+		self.childDescriptionclinvars=[]
+		self.RecordStatuschild=[]
+		self.childReviewStatus=[]
+		self.childDescription=[]
+		self.originClinVarAssertion=[]
+		self.childRefElement=[]
+		self.clinMethod=[]
+		self.clinSignificance=False
 		
 		
 	
@@ -155,10 +172,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.ClinaVarsetID, self.ChromoSome0, self.ClinicalSign, self.assembly,self.Start,self.End,self.displayStart,self.displayStop,self.outerStart,self.outerStop,self.start,self.stop,self.innerstart,self.innerstop,self.clinicalSignificance="","","","","","","","","","","","","","",""
 
 		self.output_file=open(output_filename,'w')
-		#header = ['ChromoSome','assembly','displayStart','displayStop','outerStart','outerStop','innerstart','innerstop','start','stop','significance','DateLastEvaluatedSignificance','TraitSetType','TraitSetId','TraitType','TraitId']
-	#	header = ['clinVarSetId','Record Status','Title','Accession','ChromoSome','assembly','assemblyStatus','Strand','variantLength','displayStart','displayStop','outerStart','outerStop','innerstart','innerstop','start','stop','clinical significance','Date for signiFicance','ReviewStatus','Origin','collection Method','Submission Accession','MeasureType','allele Id','Variant type','Cytogenetic Location','title and condition','general information-Submitter','Last Updated','type of consequance(change)','Content of consequence','Type of gene relationship','HGVS']
 		
-		header=['clinical significance(clinvar)','review status(clinVar)','Record Status(clinVar)','Evaluated Date(clinVar)','Origin(clinVar)','Accession(clinVar)','ID clinVar','Variant type','chromosome','Assembly','Assembly Status','Strand','variantLength','displayStart','displayStop','outerStart','outerStop','innerstart','innerstop','start','stop','referenceAllele','alternateAllele','positionVCF','referenceAlleleVCF','alternateAlleleVCF','Cytogenetic location','HGVS','Molecular Consequence','clinical significance','Review Status','Record Status','Evaluate Date','submission Accession','Origin','Date of Submission','Method','Title','Condition(s)']
+		
+		header=["ID clinVar","Variant type","chromosome","Assembly","Assembly Status","Strand","variantLength","displayStart","displayStop","outerStart","outerStop","innerstart","innerstop","start","stop","referenceAllele","alternateAllele","positionVCF","referenceAlleleVCF","alternateAlleleVCF","Record Status(clinVar)","review status(clinVar)","clinical significance(clinvar)","Accession(clinVar)","Cytogenetic location","Protein change","HGVS","Mollecular Consequence","conditions-Identifier","conditions-Name","clinical assertion(Record Status)","clinical assertion(Review Status)","clinical assertion(clinical Significance)","clinical assertion(Origin)","clinical assertion(submitter infor_who)","clinical assertion(submitter infor_date)","clinical assertion(method)","clinical assertion(citations)","clinical assertion(conditions-Mode of inheritance)","submission Accession","Title"]
 		header_line=','.join(header)
 		self.output_file.write(header_line+'\n')
 
@@ -190,9 +206,23 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childattributeHGVS=[]
 			self.childattributeMconsequence=[]
 			self.childProteinChange=[]
+			self.Inheritance=[]
 			self.text_content=[]
 			self.idXREFtrait=[]
 			self.dbXREFtrait=[]
+			self.relations=[]
+			self.RecordStatuschildclinvar=[]
+			self.childReviewStatuclinvars=[]
+			self.childDescriptionclinvars=[]
+			self.RecordStatuschild=[]
+			self.childReviewStatus=[]
+			self.childDescription=[]
+			self.originClinVarAssertion=[]
+			self.childlist_Origin=[]
+			self.childRefElement=[]
+			self.clinMethod=[]
+			self.citation_id=[]
+
 
 
 
@@ -200,6 +230,38 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 			self.ClinaVarsetID=attributes.get('ID')
+
+
+
+		if tag=="Trait":
+			self.parentflag=True
+
+			self.parentnameflag=True
+
+
+
+		if tag=="Name":
+			self.id_XRef=""
+			self.db_XRef=""
+
+
+
+		if tag=="ReferenceClinVarAssertion":
+			self.Refparentflag=True
+
+
+
+
+		if tag=="ClinVarAssertion":
+
+			self.ClinVarparentflag=True
+
+
+
+
+
+
+
 
 
 
@@ -227,6 +289,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 		if tag=="ClinicalSignificance":
+
 			self.DateLastEvaluatedSignificance=attributes.get('DateLastEvaluated')
 
 			
@@ -538,6 +601,21 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childcitationid=self.citation_id
 			
 
+
+
+		if tag=="ReferenceClinVarAssertion":
+
+			self.Refparentflag=True
+
+
+		if tag == "ClinicalSignificance":
+
+			self.clinSignificance=True
+
+
+
+			
+
 			
 
 
@@ -562,6 +640,15 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.localKeySub=attributes.get('localKey')
 			self.submitterSub=attributes.get('submitter')
 			self.submitterDateSub=attributes.get('submitterDate')
+
+
+
+
+
+
+
+
+			
 		
 		
 
@@ -622,6 +709,11 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			elif attributes.get('Type')=="ProteinChange3LetterCode":
 
 				self.childProteinChange.append(self.attribute)
+
+			elif attributes.get('Type')=="ModeOfInheritance":
+
+				self.Inheritance.append(self.attribute)
+
 
 
 
@@ -773,10 +865,85 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 	def endElement (self,tag):
 
+		if tag=="XRef" and self.parentflag==True and self.parentnameflag==False:
+
+			self.id_XRef=self.id_XRef
+			self.db_XRef=self.db_XRef
+
+			self.relations.append((self.id_XRef,self.db_XRef))
+
+
+
+
+
+		
+			
+		
+
+
+		
+
+
+		if tag=="Name":
+			self.parentnameflag = False
+
+			self.XrefName.append(self.id_XRef)
+			self.XrefNamedb.append(self.db_XRef)
+
+			#self.exampleName=self.id_XRef
+
+
+
+
+
+
+		if tag == "Trait":
+
+
+			self.parentflag = False
+
+			#if self.id_XRef is not None:
+
+			self.chiltrait.append(self.id_XRef)
+			self.childlist3trait.append(self.db_XRef)
+
 		#print ("Element end: %s" % tag)
 
 		if tag == 'Trait':
 			self.inside_text_tag = False
+
+
+		if tag=="ElementValue" and self.parentflag==True and self.parentnameflag==True and self.Refparentflag==True:
+
+			self.childRefElement.append(self.ElementValue)
+
+
+
+
+		if tag=="ClinVarSubmissionID":
+			self.localKeySub=self.localKeySub
+			self.submitterSub=self.submitterSub
+			self.submitterDateSub=self.submitterDateSub
+
+			if self.submitterSub is not None:
+
+				self.examplesubmitterSub.append(self.submitterSub)
+
+			elif self.submitterSub is  None:
+
+				self.examplesubmitterSub.append("no submitter Infor")
+
+
+			if self.submitterDateSub is not None:
+
+				self.examplesubmitterDateSub.append(self.submitterDateSub)
+
+			elif self.submitterDateSub is None:
+
+				self.examplesubmitterDateSub.append("no submiter Date ")
+
+
+			
 			
 
 			
@@ -796,11 +963,77 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-		if tag == "ReferenceClinVarAssertion":
 
-			self.parentflag = False
 
-			self.childlist3=self.RecordStatuschild
+
+		if tag=="ReferenceClinVarAssertion":
+			self.Refparentflag=False
+
+
+
+		if tag=="ClinVarAssertion":
+
+			self.ClinVarparentflag=True
+
+
+		if tag=="Citation":
+
+			 self.CitationExaple=True
+
+
+		if tag=="ClinicalSignificance":
+
+			self.clinSignificance=False
+
+
+		if self.CurrentData=="RecordStatus" and self.ClinVarparentflag==True:
+			self.RecordStatuschildclinvar.append(self.RecordStatus)
+			
+
+
+		if self.CurrentData=="ReviewStatus" and self.ClinVarparentflag==True :
+
+			self.childReviewStatuclinvars.append(self.ReviewStatus)
+			
+
+
+		if tag == "ClinicalSignificance" and self.ClinVarparentflag==True:
+			self.childDescriptionclinvars.append(self.Description)
+
+		if self.CurrentData=="Origin" and self.ClinVarparentflag==True:
+			
+			self.childlist_Origin.append(self.Origin)
+			
+
+
+
+			
+
+
+
+		if self.CurrentData=="RecordStatus" and self.Refparentflag==True:
+			self.RecordStatuschild.append(self.RecordStatus)
+
+
+		if self.CurrentData=="ReviewStatus" and self.Refparentflag==True :
+
+			self.childReviewStatus.append(self.ReviewStatus)
+
+
+		if tag == "ClinicalSignificance" and self.Refparentflag==True:
+			self.childDescription.append(self.Description)
+
+
+		
+		
+
+
+		
+
+
+
+
+
 			
 			
 
@@ -820,19 +1053,15 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		if self.CurrentData=="Title":
 			self.childlist_title=self.Title
 
-		if self.CurrentData=="ReviewStatus"   :
-
-			self.childReviewStatus=self.ReviewStatus
 
 
-		if self.CurrentData=="Origin":
-			
-			self.childlist_Origin=self.Origin
 
 
-		if self.CurrentData=="MethodType":
-			
-			self.childlist_MethodType=self.MethodType
+
+		if self.CurrentData=="MethodType" and self.ClinVarparentflag==True:
+
+			self.clinMethod.append(self.MethodType)
+
 
 
 
@@ -843,8 +1072,6 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-		if self.CurrentData=="RecordStatus":
-			self.RecordStatuschild=self.RecordStatus
 
 
 
@@ -855,9 +1082,13 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 		
-		if self.CurrentData=="ID":
 
-			self.citation_id=self.ID
+
+		if self.CurrentData=="ID" and self.ClinVarparentflag==True and self.clinSignificance==True and self.CitationExaple==True:
+
+			self.citation_id.append((self.IDcitation,self.ID))
+
+	
 
 
 
@@ -921,119 +1152,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-		if tag == "ClinicalSignificance":
-
-
-
-			
-
-
-
 		
-
-	
-
-			self.parentflag = False
-
-			if self.Description is not None:
-
-				self.childlist=self.Description
-				self.childReview=self.childReviewStatus
-
-
-				if self.i==0:
-
-					self.output_file.write('\n')
-
-					self.output_file.write("clinVar"+' '+self.childlist+' ')
-					self.output_file.write("clinVar"+' '+self.childReviewStatus+',')
-					self.output_file.write("clinVar"+' '+self.RecordStatuschild+',')
-					if self.DateLastEvaluatedSignificance is not None:
-
-						self.output_file.write("clinVar"+' '+self.DateLastEvaluatedSignificance+',')
-					elif self.DateLastEvaluatedSignificance is None:
-
-						self.output_file.write("Nan evalate date"+',')
-
-
-					if self.childlist_Origin is not None:
-						self.output_file.write("clinVar"+' '+self.childlist_Origin+',')
-
-					elif self.childlist_Origin is  None:
-						self.output_file.write("Nan origin"+',')
-
-
-					self.output_file.write(self.RCV+',')
-
-
-
-				elif self.i >=1:
-
-					self.example.append(self.childlist)
-					self.exampleReview.append(self.childReview)
-					self.exampleRecordStatus.append(self.RecordStatuschild)
-
-					if self.DateLastEvaluatedSignificance is not None:
-						self.exampleDate.append(self.DateLastEvaluatedSignificance)
-
-					elif self.DateLastEvaluatedSignificance is None:
-
-						self.exampleDate.append("Nan evaluate date")
-
-					if self.childlist_Origin is not None:
-						self.exampleOrigin.append(self.childlist_Origin)
-
-					elif self.childlist_Origin is  None:
-						self.exampleOrigin.append("Nan origin")
-
-					if self.submitterSub is not None:
-
-						self.examplesubmitterSub.append(self.submitterSub)
-
-					elif self.submitterSub is  None:
-
-						self.examplesubmitterSub.append("no submitter Infor")
-
-					if self.submitterDateSub is not None:
-						self.examplesubmitterDateSub.append(self.submitterDateSub)
-
-					elif self.submitterDateSub is None:
-						self.examplesubmitterDateSub.append("no submiter Date ")
-
-					if self.MethodType is not None:
-						self.exampleMethod.append(self.MethodType)
-					elif  self.MethodType is None:
-						self.exampleMethod.append("no method infor")
-
-
-
-
-
-
-					
-
-
-
-					
-					
-
-
-				self.i=self.i+1
-
-
-			if self.Description is  None:
-
-				self.output_file.write("Nan")
-
-
-
-
-
-
-
-			
-
-
 
 
 
@@ -1054,20 +1173,35 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 		if tag=="ClinVarSet":
+			self.output_file.write("clinVar"+' '+str(self.RecordStatuschild)+',')
+			self.output_file.write("clinVar"+' '+str(self.childReviewStatus)+',')
+			self.output_file.write("clinVar"+' '+str(self.childDescription)+',')
+			self.output_file.write(self.RCV+',')
+
+			
+
+
 
 			self.output_file.write(self.CytogeneticLocationchild+',')
 			self.output_file.write(str(self.childProteinChange)+',')
 			self.output_file.write(str(self.childattributeHGVS)+',')
 			self.output_file.write(str(self.childattributeMconsequence)+',')
-			self.output_file.write(str(self.example)+',')
-			self.output_file.write(str(self.exampleReview)+',')
-			self.output_file.write(str(self.exampleRecordStatus)+',')
-			self.output_file.write(str(self.exampleDate)+',')
+			self.output_file.write("identifier"+" "+str(self.relations)+',')
+			self.output_file.write("condition-name"+" "+str(self.childRefElement)+',')
+
+
+			self.output_file.write("clinical assertion"+" "+str(self.RecordStatuschildclinvar)+',')
+			self.output_file.write("clinical assertion"+" "+ str(self.childReviewStatuclinvars)+',')
+			self.output_file.write("clinical assertion"+" "+str(self.childDescriptionclinvars)+',')
+			self.output_file.write("clinical assertion"+" " + str(self.childlist_Origin)+',')
+			self.output_file.write("clinical assertion(submitter infor_who)"+" "+ str(self.examplesubmitterSub)+',')
+			self.output_file.write("clinical assertion(submitter infor_date)"+" "+ str(self.examplesubmitterDateSub)+',')
+			self.output_file.write("clinical assertion(method)"+" "+ str(self.clinMethod)+',')
+			self.output_file.write("clinical assertion(citations)"+" "+ str(self.citation_id)+',')
+			self.output_file.write("clinical assertion(conditions-Mode of inheritance)"+" "+ str(self.Inheritance)+',')
+
 			self.output_file.write(str(self.SCV)+',')
-			self.output_file.write(str(self.exampleOrigin)+',')
-			self.output_file.write(str(self.examplesubmitterSub)+',')
-			self.output_file.write(str(self.examplesubmitterDateSub)+',')
-			self.output_file.write(str(self.exampleMethod)+',')
+		
 		
 
 			self.output_file.write(' ')
@@ -1076,15 +1210,32 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			data=[self.childlist_title]
 			data_line=','.join(map(str, data))
 			self.output_file.write(data_line+',')
+			
 
-			self.text_content = [i.split("\n") for i in self.text_content]
+			print("conditions",self.childRefElement)
+			print("eimai to identifier",self.relations)
+			print("method",self.clinMethod)
+			print("citations",self.citation_id)
 
-			self.text_content = [j for i in self.text_content for j in i]
+		
 
-			self.text_content=[x.strip() for x in self.text_content if x.strip()]
 
-			self.text_content = list(set(self.text_content))
-			self.output_file.write(str(self.text_content)+',')
+
+
+
+
+
+			
+
+
+
+	
+
+
+		
+
+
+
 
 		
 
@@ -1242,11 +1393,11 @@ if( __name__ =="__main__"):
 	parser = xml.sax.make_parser()
 	# turn off namepsaces
 	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-	Handler=ClinVarHandler("epameinondas.csv")
+	Handler=ClinVarHandler("euterpi.csv")
 
 	parser.setContentHandler(Handler)
 	
-	parser.parse("test.xml")
+	parser.parse("test2.xml")
 
 
 	
