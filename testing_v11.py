@@ -86,19 +86,19 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.clinvarexample=""
 		self.ClinVarSet=""
 		self.childlist4=""
-		self.childChromosome=""
-		self.childassembly=""
-		self.childAssemblyStatus=""		
-		self.childstrand=""
-		self.childvariantLength=""
-		self.childisplayStart=""
-		self.childisplayStop=""
-		self.childouterStart=""
-		self.childouterStop=""
-		self.childinnerstart=""
-		self.childinnerstop=""
-		self.childstart=""
-		self.childstop=""
+		self.childChromosome=[]
+		self.childassembly=[]
+		self.childAssemblyStatus=[]		
+		self.childstrand=[]
+		self.childvariantLength=[]
+		self.childisplayStart=[]
+		self.childisplayStop=[]
+		self.childouterStart=[]
+		self.childouterStop=[]
+		self.childinnerstart=[]
+		self.childinnerstop=[]
+		self.childstart=[]
+		self.childstop=[]
 		self.childRCV=""
 		self.childSCV=""
 		self.childEvaluate=""
@@ -128,11 +128,11 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.positionAlleleVCF=""
 		self.refAlleleVCF=""
 		self.alterAlleleVCF=""
-		self.childrefAllele=""
-		self.childalterAllele=""
-		self.childpositionAlleleVCF=""
-		self.childrefAlleleVCF=""
-		self.childalterAlleleVCF=""
+		self.childrefAllele=[]
+		self.childalterAllele=[]
+		self.childpositionAlleleVCF=[]
+		self.childrefAlleleVCF=[]
+		self.childalterAlleleVCF=[]
 		self.exampleElement=""
 		self.parentflagExample=""
 		self.text_content=[]
@@ -159,9 +159,11 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.childRefElement=[]
 		self.clinMethod=[]
 		self.clinSignificance=False
+		self.DateLastEvaluatedSignificanceParent=[]
 		
+
+
 		
-	
 		
 	
 
@@ -174,7 +176,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.output_file=open(output_filename,'w')
 		
 		
-		header=["ID clinVar","Variant type","chromosome","Assembly","Assembly Status","Strand","variantLength","displayStart","displayStop","outerStart","outerStop","innerstart","innerstop","start","stop","referenceAllele","alternateAllele","positionVCF","referenceAlleleVCF","alternateAlleleVCF","Record Status(clinVar)","review status(clinVar)","clinical significance(clinvar)","Accession(clinVar)","Cytogenetic location","Protein change","HGVS","Mollecular Consequence","conditions-Identifier","conditions-Name","clinical assertion(Record Status)","clinical assertion(Review Status)","clinical assertion(clinical Significance)","clinical assertion(Origin)","clinical assertion(submitter infor_who)","clinical assertion(submitter infor_date)","clinical assertion(method)","clinical assertion(citations)","clinical assertion(conditions-Mode of inheritance)","submission Accession","Title"]
+		header=["ID clinVar","Variant type","chromosome","Assembly","Assembly Status","Strand","variantLength","displayStart","displayStop","outerStart","outerStop","innerstart","innerstop","start","stop","referenceAllele","alternateAllele","positionVCF","referenceAlleleVCF","alternateAlleleVCF","Date Last Evaluated","Record Status(clinVar)","review status(clinVar)","clinical significance(clinvar)","Accession(clinVar)","Cytogenetic location","Protein change","HGVS","Mollecular Consequence","conditions-Identifier","conditions-Name","clinical assertion(Record Status)","clinical assertion(Review Status)","clinical assertion(Date Last Evaluated)","clinical assertion(clinical Significance)","clinical assertion(Origin)","clinical assertion(submitter infor_who)","clinical assertion(submitter infor_date)","clinical assertion(method)","clinical assertion(citations)","clinical assertion(conditions-Mode of inheritance)","submission Accession","Title"]
 		header_line=','.join(header)
 		self.output_file.write(header_line+'\n')
 
@@ -222,6 +224,27 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childRefElement=[]
 			self.clinMethod=[]
 			self.citation_id=[]
+			self.childChromosome=[]
+			self.childassembly=[]
+			self.childAssemblyStatus=[]		
+			self.childstrand=[]
+			self.childvariantLength=[]
+			self.childisplayStart=[]
+			self.childisplayStop=[]
+			self.childouterStart=[]
+			self.childouterStop=[]
+			self.childinnerstart=[]
+			self.childinnerstop=[]
+			self.childstart=[]
+			self.childstop=[]
+			self.childrefAllele=[]
+			self.childalterAllele=[]
+			self.childpositionAlleleVCF=[]
+			self.childrefAlleleVCF=[]
+			self.childalterAlleleVCF=[]
+			self.DateLastEvaluatedSignificanceParent=[]
+
+
 
 
 
@@ -288,9 +311,25 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-		if tag=="ClinicalSignificance":
+		if tag=="ClinicalSignificance" and self.Refparentflag==True:
 
 			self.DateLastEvaluatedSignificance=attributes.get('DateLastEvaluated')
+			
+
+
+
+
+		if tag=="ClinicalSignificance" and self.ClinVarparentflag==True:
+
+			self.DateLastEvaluatedSignificanceParent.append(attributes.get('DateLastEvaluated'))
+			#print("etsi",self.DateLastEvaluatedSignificanceParent)
+
+			
+
+
+		
+
+			
 
 			
 
@@ -306,12 +345,13 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		
 
-		if tag=="Measure":
+		if tag=="Measure" and self.Refparentflag==True:
+		
 
 			self.variationType= attributes.get('Type')
 			self.variationId=attributes.get('ID')
 			
-			#print(self.variationType)
+		
 
 
 
@@ -599,6 +639,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 				self.abbrevCitation='Nan'
 
 			self.childcitationid=self.citation_id
+
 			
 
 
@@ -1024,6 +1065,11 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childDescription.append(self.Description)
 
 
+
+
+
+
+
 		
 		
 
@@ -1065,7 +1111,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-		if self.CurrentData=="Measure":
+		if self.CurrentData=="Measure ":
+
 			self.MeasureChild=self.Measure
 
 			
@@ -1088,6 +1135,12 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 			self.citation_id.append((self.IDcitation,self.ID))
 
+
+
+
+			
+
+
 	
 
 
@@ -1099,30 +1152,30 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-		if tag=="SequenceLocation":
+		if tag=="SequenceLocation" and self.Refparentflag==True:
 
 		
 
 			
 
-			self.childChromosome=self.ChromoSome0
-			self.childassembly=self.assembly
-			self.childAssemblyStatus=self.AssemblyStatus		
-			self.childstrand=self.strand
-			self.childvariantLength=self.variantLength
-			self.childisplayStart=self.displayStart
-			self.childisplayStop=self.displayStop
-			self.childouterStart=self.outerStart
-			self.childouterStop=self.outerStop
-			self.childinnerstart=self.innerstart
-			self.childinnerstop=self.innerstop
-			self.childstart=self.start
-			self.childstop=self.stop
-			self.childrefAllele=self.refAllele
-			self.childalterAllele=self.alterAllele
-			self.childpositionAlleleVCF=self.positionAlleleVCF
-			self.childrefAlleleVCF=self.refAlleleVCF
-			self.childalterAlleleVCF=self.alterAlleleVCF
+			self.childChromosome.append(self.ChromoSome0)
+			self.childassembly.append(self.assembly)
+			self.childAssemblyStatus.append(self.AssemblyStatus)		
+			self.childstrand.append(self.strand)
+			self.childvariantLength.append(self.variantLength)
+			self.childisplayStart.append(self.displayStart)
+			self.childisplayStop.append(self.displayStop)
+			self.childouterStart.append(self.outerStart)
+			self.childouterStop.append(self.outerStop)
+			self.childinnerstart.append(self.innerstart)
+			self.childinnerstop.append(self.innerstop)
+			self.childstart.append(self.start)
+			self.childstop.append(self.stop)
+			self.childrefAllele.append(self.refAllele)
+			self.childalterAllele.append(self.alterAllele)
+			self.childpositionAlleleVCF.append(self.positionAlleleVCF)
+			self.childrefAlleleVCF.append(self.refAlleleVCF)
+			self.childalterAlleleVCF.append(self.alterAlleleVCF)
 
 			
 
@@ -1137,8 +1190,14 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			#data =[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop]
 
 			
-			data =[','+self.ClinaVarsetID ,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF]
+			#data =[','+self.ClinaVarsetID ,self.variationType,
+
+
+			data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance]
 			data_line=','.join(map(str, data))
+
+
+		
 
 
 			
@@ -1190,8 +1249,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.output_file.write("condition-name"+" "+str(self.childRefElement)+',')
 
 
-			self.output_file.write("clinical assertion"+" "+str(self.RecordStatuschildclinvar)+',')
-			self.output_file.write("clinical assertion"+" "+ str(self.childReviewStatuclinvars)+',')
+			self.output_file.write("clinical assertion-Record Satus"+" "+str(self.RecordStatuschildclinvar)+',')
+			self.output_file.write("clinical assertion-Review Satus"+" "+ str(self.childReviewStatuclinvars)+',')
+			self.output_file.write("clinical assertion-Date"+" "+ str(self.DateLastEvaluatedSignificanceParent)+',')
 			self.output_file.write("clinical assertion"+" "+str(self.childDescriptionclinvars)+',')
 			self.output_file.write("clinical assertion"+" " + str(self.childlist_Origin)+',')
 			self.output_file.write("clinical assertion(submitter infor_who)"+" "+ str(self.examplesubmitterSub)+',')
@@ -1212,10 +1272,10 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.output_file.write(data_line+',')
 			
 
-			print("conditions",self.childRefElement)
-			print("eimai to identifier",self.relations)
-			print("method",self.clinMethod)
-			print("citations",self.citation_id)
+			#print("conditions",self.childRefElement)
+			#print("eimai to identifier",self.relations)
+			#print("method",self.clinMethod)
+			#print("citations",self.citation_id)
 
 		
 
@@ -1384,20 +1444,31 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		
 
-
-
-		
 if( __name__ =="__main__"):
 
 	
 	parser = xml.sax.make_parser()
 	# turn off namepsaces
 	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-	Handler=ClinVarHandler("euterpi.csv")
-
+	Handler=ClinVarHandler("mitsos.csv")
 	parser.setContentHandler(Handler)
+	f=gzip.open("ClinVarFullRelease_2018-07.xml.gz")
+	parser.parse(f)
+	f.close()
 	
-	parser.parse("test2.xml")
+
+		
+#if( __name__ =="__main__"):
+
+	
+#	parser = xml.sax.make_parser()
+	# turn off namepsaces
+#	parser.setFeature(xml.sax.handler.feature_namespaces,0)
+#	Handler=ClinVarHandler("test.csv")
+
+#	parser.setContentHandler(Handler)
+	
+#	parser.parse("test.xml")
 
 
 	
