@@ -3,6 +3,7 @@ from pandas import read_csv
 import datetime
 import gzip
 import csv
+import xml.sax.saxutils as saxutils
 
 '''
 Very well done!
@@ -17,7 +18,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 	def __init__(self,output_filename):
 
 		self.CurrentData=""
-		self.Title=""
+		self.Title=[]
 		self.XRef =""
 		self.SequenceLocation=""
 		self.ReviewStatus=""
@@ -248,6 +249,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.DateLastEvaluatedSignificanceParent=[]
 			self.childattributeHGVS1=[]
 			self.attribute1=[]
+			self.Title=[]
 
 
 
@@ -1157,7 +1159,12 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 		if self.CurrentData=="Title":
+
 			self.childlist_title=self.Title
+			self.childlist_title = ''.join(map(str, self.childlist_title))
+	
+			
+
 
 
 
@@ -1359,7 +1366,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		
 			
 
-			#print("conditions",self.childRefElement)
+			print("conditions",self.childRefElement)
 			#print("eimai to identifier",self.relations)
 			#print("method",self.clinMethod)
 			#print("citations",self.citation_id)
@@ -1432,7 +1439,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		if self.CurrentData=="Title":
 
-			self.Title =content
+			self.Title.append(saxutils.unescape(content))
+
+			
 
 		if self.CurrentData=="XRef":
 
@@ -1623,7 +1632,7 @@ if( __name__ =="__main__"):
 	parser = xml.sax.make_parser()
 	# turn off namepsaces
 	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-	Handler=ClinVarHandler("euterpi.csv")
+	Handler=ClinVarHandler("skata.csv")
 
 	parser.setContentHandler(Handler)
 	
