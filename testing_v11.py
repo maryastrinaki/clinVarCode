@@ -160,6 +160,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.clinMethod=[]
 		self.clinSignificance=False
 		self.DateLastEvaluatedSignificanceParent=[]
+		self.childattributeHGVS1=[]
+		self.currenttype=""
+
 		
 
 
@@ -243,6 +246,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childrefAlleleVCF=[]
 			self.childalterAlleleVCF=[]
 			self.DateLastEvaluatedSignificanceParent=[]
+			self.childattributeHGVS1=[]
+			self.attribute1=[]
 
 
 
@@ -735,25 +740,78 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		if tag=="Attribute":
 
+
 			if attributes.get('Type')=="HGVS":
 
-				self.childattributeHGVS.append(self.attribute)
+				self.currenttype=attributes.get("Type")
 
-			elif attributes.get('Type')=="MolecularConsequence":
+			if attributes.get('Type')=="HGVS, coding, RefSeq":
 
-				self.childattributeMconsequence.append(self.attribute)
+				self.currenttype=attributes.get("Type")
+				
 
-			elif attributes.get('Type')=="ProteinChange1LetterCode":
+			if attributes.get('Type')=="HGVS, genomic, RefSeqGene":
 
-				self.childProteinChange.append(self.attribute)
+				self.currenttype=attributes.get("Type")
 
-			elif attributes.get('Type')=="ProteinChange3LetterCode":
+				
 
-				self.childProteinChange.append(self.attribute)
+			if attributes.get('Type')=="HGVS, genomic, top level":
 
-			elif attributes.get('Type')=="ModeOfInheritance":
+				self.currenttype=attributes.get("Type")
 
-				self.Inheritance.append(self.attribute)
+			
+
+			if attributes.get('Type')=="HGVS, protein, RefSeq":
+
+				self.currenttype=attributes.get("Type")
+
+			
+
+
+			if attributes.get('Type')=="HGVS, protein":
+
+				self.currenttype=attributes.get("Type")
+
+			
+
+
+			if attributes.get('Type')=="HGVS, coding, LRG":
+
+				self.currenttype=attributes.get("Type")
+
+		
+
+			if attributes.get('Type')=="HGVS, genomic, top level, previous":
+
+				self.currenttype=attributes.get("Type")
+
+			if attributes.get('Type')=='MolecularConsequence':
+
+				self.currenttype=attributes.get("Type")
+
+			if attributes.get('Type')=="ProteinChange1LetterCode":
+
+				self.currenttype=attributes.get("Type")
+
+			if attributes.get('Type')=="ProteinChange3LetterCode":
+
+				self.currenttype=attributes.get("Type")
+
+			if attributes.get('Type')=="ModeOfInheritance":
+
+				self.currenttype=attributes.get("Type")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -905,6 +963,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
  
 
 	def endElement (self,tag):
+
+		
 
 		if tag=="XRef" and self.parentflag==True and self.parentnameflag==False:
 
@@ -1177,6 +1237,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childrefAlleleVCF.append(self.refAlleleVCF)
 			self.childalterAlleleVCF.append(self.alterAlleleVCF)
 
+
+
+
 			
 
 
@@ -1193,8 +1256,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			#data =[','+self.ClinaVarsetID ,self.variationType,
 
 
-			data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance]
-			data_line=','.join(map(str, data))
+			#data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance]
+			#data_line=','.join(map(str, data))
 
 
 		
@@ -1203,9 +1266,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			
 
 
-			self.output_file.write(data_line+',')	
+			#self.output_file.write(data_line+',')	
 
-			self.output_file.write('\n')
+		#	self.output_file.write('\n')
 		
 
 
@@ -1232,6 +1295,20 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 		if tag=="ClinVarSet":
+			data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance]
+			data_line=','.join(map(str, data))
+
+
+		
+
+
+			
+
+
+			self.output_file.write(data_line+',')	
+
+			self.output_file.write('\n')
+		
 			self.output_file.write("clinVar"+' '+str(self.RecordStatuschild)+',')
 			self.output_file.write("clinVar"+' '+str(self.childReviewStatus)+',')
 			self.output_file.write("clinVar"+' '+str(self.childDescription)+',')
@@ -1242,9 +1319,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 			self.output_file.write(self.CytogeneticLocationchild+',')
-			self.output_file.write(str(self.childProteinChange)+',')
-			self.output_file.write(str(self.childattributeHGVS)+',')
-			self.output_file.write(str(self.childattributeMconsequence)+',')
+			self.output_file.write("ProteinChange"+' '+str(self.childProteinChange)+',')
+			self.output_file.write("HGVS"+" "+str(self.attribute1)+',')
+			self.output_file.write("MolecularCons"+" "+str(self.childattributeMconsequence)+',')
 			self.output_file.write("identifier"+" "+str(self.relations)+',')
 			self.output_file.write("condition-name"+" "+str(self.childRefElement)+',')
 
@@ -1270,6 +1347,16 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			data=[self.childlist_title]
 			data_line=','.join(map(str, data))
 			self.output_file.write(data_line+',')
+			self.output_file.write('\n')
+
+			print("HGVS",self.attribute1)
+			print("MolecularCons",self.childattributeMconsequence)
+
+			print("ProteinChange",self.childProteinChange)
+			print("Inheritance",self.Inheritance)
+			
+
+		
 			
 
 			#print("conditions",self.childRefElement)
@@ -1415,9 +1502,81 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.CytogeneticLocation=content
 
 
+
 		if self.CurrentData=="Attribute":
 
 			self.attribute=content
+			
+			if self.currenttype=="HGVS, genomic, top level, previous":
+
+				self.attribute1.append(content)#self.attribute)
+
+			if self.currenttype=="HGVS":
+
+				self.attribute1.append(content)#self.attribute)
+
+			if self.currenttype=="HGVS, coding, RefSeq":
+
+				self.attribute1.append(content)#self.attribute)
+
+			if self.currenttype=="HGVS, genomic, RefSeqGene":
+
+				self.attribute1.append(content)#self.attribute)
+
+			if self.currenttype=="HGVS, genomic, top level":
+
+				self.attribute1.append(content)#self.attribute)
+
+			if self.currenttype=="HGVS, protein, RefSeq":
+
+				self.attribute1.append(content)#self.attribute)
+
+			if self.currenttype=="HGVS, protein":
+
+				self.attribute1.append(content)#self.attribute)
+
+			if self.currenttype=="HGVS, coding, LRG":
+
+				self.attribute1.append(content)#self.attribute)
+
+
+			if  self.currenttype=="MolecularConsequence":
+
+				self.childattributeMconsequence.append(content)
+
+			if self.currenttype=="ProteinChange1LetterCode":
+
+				self.childProteinChange.append(content)
+
+			if self.currenttype=="ProteinChange3LetterCode":
+
+				self.childProteinChange.append(content)
+
+			if self.currenttype=="ModeOfInheritance":
+
+				self.Inheritance.append(content)
+
+
+			self.currenttype=""
+			
+
+
+
+
+
+
+
+
+
+
+		
+
+
+
+
+
+
+
 		
 
 
@@ -1444,31 +1603,31 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		
 
-if( __name__ =="__main__"):
-
-	
-	parser = xml.sax.make_parser()
-	# turn off namepsaces
-	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-	Handler=ClinVarHandler("mitsos.csv")
-	parser.setContentHandler(Handler)
-	f=gzip.open("ClinVarFullRelease_2018-07.xml.gz")
-	parser.parse(f)
-	f.close()
-	
-
-		
 #if( __name__ =="__main__"):
 
 	
 #	parser = xml.sax.make_parser()
 	# turn off namepsaces
 #	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-#	Handler=ClinVarHandler("test.csv")
-
+#	Handler=ClinVarHandler("mitsos.csv")
 #	parser.setContentHandler(Handler)
+#	f=gzip.open("ClinVarFullRelease_2018-07.xml.gz")
+#	parser.parse(f)
+#	f.close()
 	
-#	parser.parse("test.xml")
+
+		
+if( __name__ =="__main__"):
+
+	
+	parser = xml.sax.make_parser()
+	# turn off namepsaces
+	parser.setFeature(xml.sax.handler.feature_namespaces,0)
+	Handler=ClinVarHandler("euterpi.csv")
+
+	parser.setContentHandler(Handler)
+	
+	parser.parse("test.xml")
 
 
 	
