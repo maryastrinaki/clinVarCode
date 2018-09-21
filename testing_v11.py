@@ -163,6 +163,29 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.DateLastEvaluatedSignificanceParent=[]
 		self.childattributeHGVS1=[]
 		self.currenttype=""
+		self.citation_TheRecords=[]
+		self.childObservedFlag=False
+		self.AlleleFrequency=[]
+		self.GMAlleleFrequency=[]
+		self.attributechildstat3=False
+		self.attributechildstat4=False
+		self.attribute1stat5=False
+		self.attribute1stat6=False
+		self.attributechildstat7=False
+		self.attributechildstat8=False
+		self.attributechildstat9=False
+		self.attributechildstat10=False
+		self.attributechildstat11=False
+		self.attributechildstat12=False
+		self.attributechildstat13=False
+		self.attributechildstat14=False
+		self.attributechildstat15=False
+		self.attributechildstat16=False
+		self.attribute1stat=False
+		self.attribute1stat2=False
+		self.attribute1=[]
+		self.childlist_attr=""
+		
 
 		
 
@@ -180,7 +203,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.output_file=open(output_filename,'w')
 		
 		
-		header=["ID clinVar","Variant type","chromosome","Assembly","Assembly Status","Strand","variantLength","displayStart","displayStop","outerStart","outerStop","innerstart","innerstop","start","stop","referenceAllele","alternateAllele","positionVCF","referenceAlleleVCF","alternateAlleleVCF","Date Last Evaluated","Record Status(clinVar)","review status(clinVar)","clinical significance(clinvar)","Accession(clinVar)","Cytogenetic location","Protein change","HGVS","Mollecular Consequence","conditions-Identifier","conditions-Name","clinical assertion(Record Status)","clinical assertion(Review Status)","clinical assertion(Date Last Evaluated)","clinical assertion(clinical Significance)","clinical assertion(Origin)","clinical assertion(submitter infor_who)","clinical assertion(submitter infor_date)","clinical assertion(method)","clinical assertion(citations)","clinical assertion(conditions-Mode of inheritance)","submission Accession","Title"]
+		header=["ID clinVar","Variant type","chromosome","Assembly","Assembly Status","Strand","variantLength","displayStart","displayStop","outerStart","outerStop","innerstart","innerstop","start","stop","referenceAllele","alternateAllele","positionVCF","referenceAlleleVCF","alternateAlleleVCF","Date Last Evaluated","Record Status(clinVar)","review status(clinVar)","clinical significance(clinvar)","Accession(clinVar)","Cytogenetic location","Protein change","HGVS","Mollecular Consequence","conditions-Identifier","conditions-Name","clinical assertion(Record Status)","clinical assertion(Review Status)","clinical assertion(Date Last Evaluated)","clinical assertion(clinical Significance)","clinical assertion(Origin)","clinical assertion(submitter infor_who)","clinical assertion(submitter infor_date)","clinical assertion(method)","clinical assertion(citations)","clinical assertion(conditions-Mode of inheritance)","clinical assertion(See all records that cite these PMIDs)","submission Accession","AlleleFrequency","GMAlleleFrequency","Title"]
 		header_line=','.join(header)
 		self.output_file.write(header_line+'\n')
 
@@ -250,6 +273,9 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childattributeHGVS1=[]
 			self.attribute1=[]
 			self.Title=[]
+			self.citation_TheRecords=[]
+			self.AlleleFrequency=[]
+			self.GMAlleleFrequency=[]
 
 
 
@@ -285,6 +311,14 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		if tag=="ClinVarAssertion":
 
 			self.ClinVarparentflag=True
+
+		if tag=="ObservedData":
+
+			self.childObservedFlag=True
+
+		
+
+
 
 
 
@@ -805,6 +839,18 @@ class ClinVarHandler( xml.sax.ContentHandler):
 				self.currenttype=attributes.get("Type")
 
 
+			if attributes.get('Type')=="AlleleFrequency":
+
+				self.currenttype=attributes.get("Type")
+
+			if attributes.get('Type')=="GlobalMinorAlleleFrequency":
+
+				self.currenttype=attributes.get("Type")
+
+
+
+
+
 
 
 
@@ -1089,6 +1135,12 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.clinSignificance=False
 
 
+		if tag=="ObservedData":
+
+			self.childObservedFlag=False
+
+
+
 		if self.CurrentData=="RecordStatus" and self.ClinVarparentflag==True:
 			self.RecordStatuschildclinvar.append(self.RecordStatus)
 			
@@ -1162,7 +1214,38 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 			self.childlist_title=self.Title
 			self.childlist_title = ''.join(map(str, self.childlist_title))
-	
+
+		if tag=="Attribute":
+			self.attributechildstat3=False
+			self.attributechildstat4=False
+			self.attribute1stat5=False
+			self.attribute1stat6=False
+			self.attributechildstat7=False
+			self.attributechildstat8=False
+			self.attributechildstat9=False
+			self.attributechildstat10=False
+			self.attributechildstat11=False
+			self.attributechildstat12=False
+			self.attributechildstat13=False
+			self.attributechildstat14=False
+			self.attributechildstat15=False
+			self.attributechildstat16=False
+			self.attribute1stat=False
+			self.attribute1stat2=False
+			self.currenttype=""
+
+			self.childlist_attr=self.attribute1
+			self.childlist_attr = ' '.join(map(str, self.childlist_attr))
+			self.childlist_attr=[self.childlist_attr]
+
+
+
+
+
+
+
+
+		
 			
 
 
@@ -1201,6 +1284,12 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		if self.CurrentData=="ID" and self.ClinVarparentflag==True and self.clinSignificance==True and self.CitationExaple==True:
 
 			self.citation_id.append((self.IDcitation,self.ID))
+
+
+		if self.CurrentData=="ID" and self.ClinVarparentflag==True and self.childObservedFlag==True and self.CitationExaple==True:
+
+			self.citation_TheRecords.append((self.IDcitation,self.ID))
+
 
 
 
@@ -1327,7 +1416,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 			self.output_file.write(self.CytogeneticLocationchild+',')
 			self.output_file.write("ProteinChange"+' '+str(self.childProteinChange)+',')
-			self.output_file.write("HGVS"+" "+str(self.attribute1)+',')
+			self.output_file.write("HGVS"+" "+str(self.childlist_attr)+',')
 			self.output_file.write("MolecularCons"+" "+str(self.childattributeMconsequence)+',')
 			self.output_file.write("identifier"+" "+str(self.relations)+',')
 			self.output_file.write("condition-name"+" "+str(self.childRefElement)+',')
@@ -1343,8 +1432,19 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.output_file.write("clinical assertion(method)"+" "+ str(self.clinMethod)+',')
 			self.output_file.write("clinical assertion(citations)"+" "+ str(self.citation_id)+',')
 			self.output_file.write("clinical assertion(conditions-Mode of inheritance)"+" "+ str(self.Inheritance)+',')
+			self.output_file.write("clinical assertion(See all records that cite these PMIDs)"+" "+ str(self.citation_TheRecords)+',')
+
+			
 
 			self.output_file.write(str(self.SCV)+',')
+
+			self.output_file.write(str(self.AlleleFrequency)+',')
+
+			self.output_file.write(str(self.GMAlleleFrequency)+',')
+
+
+
+				
 		
 		
 
@@ -1356,20 +1456,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.output_file.write(data_line+',')
 			self.output_file.write('\n')
 
-			print("HGVS",self.attribute1)
-			print("MolecularCons",self.childattributeMconsequence)
-
-			print("ProteinChange",self.childProteinChange)
-			print("Inheritance",self.Inheritance)
-			
-
-		
-			
-
-			print("conditions",self.childRefElement)
-			#print("eimai to identifier",self.relations)
-			#print("method",self.clinMethod)
-			#print("citations",self.citation_id)
+			print("skata11", self.childlist_attr)
 
 		
 
@@ -1516,57 +1603,225 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 			self.attribute=content
 			
-			if self.currenttype=="HGVS, genomic, top level, previous":
+			
+			if self.currenttype=="HGVS, genomic, top level, previous" and self.attributechildstat3==True:
+			
 
-				self.attribute1.append(content)#self.attribute)
+				self.attribute1.append(saxutils.unescape(content))
 
-			if self.currenttype=="HGVS":
+				self.attributechildstat3=False
+				self.attributechildstat4=False
+				self.currenttype=""
 
-				self.attribute1.append(content)#self.attribute)
 
-			if self.currenttype=="HGVS, coding, RefSeq":
+			if self.currenttype=="HGVS, genomic, top level, previous" and self.attributechildstat4==True:
 
-				self.attribute1.append(content)#self.attribute)
+				self.attribute1.append(saxutils.unescape(content))
 
-			if self.currenttype=="HGVS, genomic, RefSeqGene":
+				self.attributechildstat3=True
 
-				self.attribute1.append(content)#self.attribute)
+			if self.currenttype=="HGVS, genomic, top level, previous" and self.attributechildstat4==False:
+				self.attribute1.append(","+content)
+				self.attributechildstat4=True
 
-			if self.currenttype=="HGVS, genomic, top level":
+		
 
-				self.attribute1.append(content)#self.attribute)
+			
 
-			if self.currenttype=="HGVS, protein, RefSeq":
 
-				self.attribute1.append(content)#self.attribute)
 
-			if self.currenttype=="HGVS, protein":
 
-				self.attribute1.append(content)#self.attribute)
 
-			if self.currenttype=="HGVS, coding, LRG":
+				
 
-				self.attribute1.append(content)#self.attribute)
+			if self.currenttype=="HGVS"and  self.attributechildstat5==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attribute1stat5=False
+				self.attribute1stat6=False
+				self.currenttype=""
+
+			if self.currenttype=="HGVS" and self.attributechildstat6==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attribute1stat5=True
+
+			if self.currenttype=="HGVS" and self.attributechildstat6==False:
+				self.attribute1.append(","+content)
+				self.attributechildstat6=True
+
+
+
+
+
+			if self.currenttype=="HGVS, coding, RefSeq" and self.attribute1stat2==True:
+				self.attribute1.append(saxutils.unescape(content))
+				self.attribute1stat2=False
+				self.attribute1stat=False
+				self.currenttype=""
+
+
+			if self.currenttype=="HGVS, coding, RefSeq" and self.attribute1stat==True:
+
+				#self.attribute1=join(str(self.attribute1[0]), "", saxutils.unescape(content) )
+				self.attribute1.append(saxutils.unescape(content))
+				#self.attribute1=''.join(self.attribute1)
+				self.attribute1stat2=True
+				#self.currenttype=""
+
+			
+			if self.currenttype=="HGVS, coding, RefSeq" and self.attribute1stat==False:
+
+				self.attribute1.append(","+content)#self.attribute)
+				self.attribute1stat=True
+			#	self.currenttype=""
+
+
+
+
+			
+
+			if self.currenttype=="HGVS, genomic, RefSeqGene" and self.attributechildstat7==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat7=False
+				self.attributechildstat8=False
+				self.currenttype=""
+
+
+			if self.currenttype=="HGVS, genomic, RefSeqGene" and self.attributechildstat8==True:
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat7=True
+
+			if self.currenttype=="HGVS, genomic, RefSeqGene" and self.attributechildstat8==False:
+
+				self.attribute1.append(","+content)#self.attribute)
+				self.attributechildstat8=True
+
+
+
+
+
+
+
+
+
+			if self.currenttype=="HGVS, genomic, top level"  and self.attributechildstat9==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat9=False
+				self.attributechildstat10=False
+				self.currenttype=""
+
+			if self.currenttype=="HGVS, genomic, top level"  and self.attributechildstat10==True:
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat9=True
+
+			if self.currenttype=="HGVS, genomic, top level"  and self.attributechildstat10==False:
+
+				self.attribute1.append(","+content)#self.attribute)
+				self.attributechildstat10=True
+
+
+
+
+
+
+			if self.currenttype=="HGVS, protein, RefSeq" and self.attributechildstat11==True:
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat11=False
+				self.attributechildstat12=False
+				self.currenttype=""
+
+			if self.currenttype=="HGVS, protein, RefSeq" and self.attributechildstat12==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat11=True
+
+			if self.currenttype=="HGVS, protein, RefSeq" and self.attributechildstat12==False:
+				self.attribute1.append(","+content)#self.attribute)
+				self.attributechildstat12=True
+
+			
+
+
+
+
+
+			if self.currenttype=="HGVS, protein" and self.attributechildstat13==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat13=False
+				self.attributechildstat14=False
+				self.currenttype=""
+
+			if self.currenttype=="HGVS, protein" and self.attributechildstat14==True:
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat13=True
+
+			if self.currenttype=="HGVS, protein" and self.attributechildstat14==False:
+				self.attribute1.append(","+content)#self.attribute)
+				self.attributechildstat14=True
+
+
+
+
+			
+
+
+
+			if self.currenttype=="HGVS, coding, LRG" and self.attributechildstat15==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat15=False
+				self.attributechildstat16=False
+				self.currenttype=""
+
+
+			if self.currenttype=="HGVS, coding, LRG" and self.attributechildstat16==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat15=True
+
+			if self.currenttype=="HGVS, coding, LRG" and self.attributechildstat16==False:
+				self.attribute1.append(","+content)#self.attribute)
+				self.attributechildstat16=True
 
 
 			if  self.currenttype=="MolecularConsequence":
 
 				self.childattributeMconsequence.append(content)
+				self.currenttype=""
 
 			if self.currenttype=="ProteinChange1LetterCode":
 
 				self.childProteinChange.append(content)
+				self.currenttype=""
 
 			if self.currenttype=="ProteinChange3LetterCode":
 
 				self.childProteinChange.append(content)
+				self.currenttype=""
 
 			if self.currenttype=="ModeOfInheritance":
 
 				self.Inheritance.append(content)
+				self.currenttype=""
+
+			if self.currenttype=="AlleleFrequency":
+
+				self.AlleleFrequency.append(content)
+				self.currenttype=""
 
 
-			self.currenttype=""
+			if self.currenttype=="GlobalMinorAlleleFrequency":
+
+				self.GMAlleleFrequency.append(content)
+				self.currenttype=""
+
+
+
+			
 			
 
 
@@ -1612,34 +1867,21 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		
 
-#if( __name__ =="__main__"):
-
-	
-#	parser = xml.sax.make_parser()
-	# turn off namepsaces
-#	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-#	Handler=ClinVarHandler("mitsos.csv")
-#	parser.setContentHandler(Handler)
-#	f=gzip.open("ClinVarFullRelease_2018-07.xml.gz")
-#	parser.parse(f)
-#	f.close()
-	
-
-		
 if( __name__ =="__main__"):
 
 	
 	parser = xml.sax.make_parser()
 	# turn off namepsaces
 	parser.setFeature(xml.sax.handler.feature_namespaces,0)
-	Handler=ClinVarHandler("skata.csv")
-
+	Handler=ClinVarHandler("mitsos.csv")
 	parser.setContentHandler(Handler)
+	f=gzip.open("ClinVarFullRelease_2018-07.xml.gz")
+	parser.parse(f)
+	f.close()
 	
-	parser.parse("test.xml")
 
+		
 
-	
 
 
 
