@@ -185,6 +185,10 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.attribute1stat2=False
 		self.attribute1=[]
 		self.childlist_attr=""
+		self.attributechildstat5=False
+		self.attributechildstat6=False
+		self.attributechildstat17=False
+		self.attributechildstat18=False
 		
 
 		
@@ -276,6 +280,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.citation_TheRecords=[]
 			self.AlleleFrequency=[]
 			self.GMAlleleFrequency=[]
+			self.attribute1=[]
 
 
 
@@ -1215,7 +1220,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.childlist_title=self.Title
 			self.childlist_title = ''.join(map(str, self.childlist_title))
 
-		if tag=="Attribute":
+		if tag=="Attribute" and self.Refparentflag==True:
 			self.attributechildstat3=False
 			self.attributechildstat4=False
 			self.attribute1stat5=False
@@ -1232,6 +1237,10 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.attributechildstat16=False
 			self.attribute1stat=False
 			self.attribute1stat2=False
+			self.attributechildstat5=False
+			self.attributechildstat6=False
+			self.attributechildstat17=False
+			self.attributechildstat18=False
 			self.currenttype=""
 
 			self.childlist_attr=self.attribute1
@@ -1315,6 +1324,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			
 
 			self.childChromosome.append(self.ChromoSome0)
+
+
 			self.childassembly.append(self.assembly)
 			self.childAssemblyStatus.append(self.AssemblyStatus)		
 			self.childstrand.append(self.strand)
@@ -1391,6 +1402,10 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 		if tag=="ClinVarSet":
+
+			
+			
+			
 			data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance]
 			data_line=','.join(map(str, data))
 
@@ -1403,7 +1418,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 			self.output_file.write(data_line+',')	
 
-			self.output_file.write('\n')
+			#self.output_file.write('\n')
 		
 			self.output_file.write("clinVar"+' '+str(self.RecordStatuschild)+',')
 			self.output_file.write("clinVar"+' '+str(self.childReviewStatus)+',')
@@ -1456,7 +1471,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			self.output_file.write(data_line+',')
 			self.output_file.write('\n')
 
-			print("skata11", self.childlist_attr)
+			
 
 		
 
@@ -1602,6 +1617,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		if self.CurrentData=="Attribute":
 
 			self.attribute=content
+
 			
 			
 			if self.currenttype=="HGVS, genomic, top level, previous" and self.attributechildstat3==True:
@@ -1788,6 +1804,34 @@ class ClinVarHandler( xml.sax.ContentHandler):
 				self.attributechildstat16=True
 
 
+
+
+
+			if self.currenttype=="HGVS, genomic" and self.attributechildstat17==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat17=False
+				self.attributechildstat18=False
+				self.currenttype=""
+
+
+			if self.currenttype=="HGVS, genomic" and self.attributechildstat18==True:
+
+				self.attribute1.append(saxutils.unescape(content))
+				self.attributechildstat17=True
+
+			if self.currenttype=="HGVS, genomic" and self.attributechildstat18==False:
+				self.attribute1.append(","+content)#self.attribute)
+				self.attributechildstat18=True
+
+
+
+
+
+
+		
+
+
 			if  self.currenttype=="MolecularConsequence":
 
 				self.childattributeMconsequence.append(content)
@@ -1818,6 +1862,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 				self.GMAlleleFrequency.append(content)
 				self.currenttype=""
+
+			self.currenttype=""
 
 
 
@@ -1881,7 +1927,20 @@ if( __name__ =="__main__"):
 	
 
 		
+#if( __name__ =="__main__"):
 
+	
+#	parser = xml.sax.make_parser()
+	# turn off namepsaces
+#	parser.setFeature(xml.sax.handler.feature_namespaces,0)
+#	Handler=ClinVarHandler("skata.csv")
+
+#	parser.setContentHandler(Handler)
+	
+#	parser.parse("test.xml")
+
+
+	
 
 
 
