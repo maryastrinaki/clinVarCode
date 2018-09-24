@@ -4,6 +4,7 @@ import datetime
 import gzip
 import csv
 import xml.sax.saxutils as saxutils
+import json
 
 '''
 Very well done!
@@ -209,7 +210,11 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		
 		header=["ID clinVar","Variant type","chromosome","Assembly","Assembly Status","Strand","variantLength","displayStart","displayStop","outerStart","outerStop","innerstart","innerstop","start","stop","referenceAllele","alternateAllele","positionVCF","referenceAlleleVCF","alternateAlleleVCF","Date Last Evaluated","Record Status(clinVar)","review status(clinVar)","clinical significance(clinvar)","Accession(clinVar)","Cytogenetic location","Protein change","HGVS","Mollecular Consequence","conditions-Identifier","conditions-Name","clinical assertion(Record Status)","clinical assertion(Review Status)","clinical assertion(Date Last Evaluated)","clinical assertion(clinical Significance)","clinical assertion(Origin)","clinical assertion(submitter infor_who)","clinical assertion(submitter infor_date)","clinical assertion(method)","clinical assertion(citations)","clinical assertion(conditions-Mode of inheritance)","clinical assertion(See all records that cite these PMIDs)","submission Accession","AlleleFrequency","GMAlleleFrequency","Title"]
 		header_line=','.join(header)
-		self.output_file.write(header_line+'\n')
+		json.dump(header_line,self.output_file)
+		self.output_file.write('\n')
+
+		#self.output_file.write(header_line+'\n')
+
 
 
 	def startElement(self,tag,attributes):
@@ -1324,8 +1329,6 @@ class ClinVarHandler( xml.sax.ContentHandler):
 			
 
 			self.childChromosome.append(self.ChromoSome0)
-
-
 			self.childassembly.append(self.assembly)
 			self.childAssemblyStatus.append(self.AssemblyStatus)		
 			self.childstrand.append(self.strand)
@@ -1346,56 +1349,6 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 
 
-
-			
-
-
-			
-		
-		
-		
-		
-
-
-			#data =[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop]
-
-			
-			#data =[','+self.ClinaVarsetID ,self.variationType,
-
-
-			#data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance]
-			#data_line=','.join(map(str, data))
-
-
-		
-
-
-			
-
-
-			#self.output_file.write(data_line+',')	
-
-		#	self.output_file.write('\n')
-		
-
-
-
-
-		
-
-
-
-
-
-
-
-
-
-
-		
-
-
-		
 			
 
 
@@ -1403,59 +1356,69 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		if tag=="ClinVarSet":
 
+
+
+
+
+
+
 			
+		
 			
-			
-			data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance]
+			data=[self.ClinaVarsetID,self.variationType,self.childChromosome,self.childassembly,self.childAssemblyStatus,self.childstrand,self.childvariantLength,self.childisplayStart,self.childisplayStop,self.childouterStart,self.childouterStop,self.childinnerstart,self.childinnerstop,self.childstart,self.childstop,self.childrefAllele,self.childalterAllele,self.childpositionAlleleVCF,self.childrefAlleleVCF,self.childalterAlleleVCF,self.DateLastEvaluatedSignificance,self.RecordStatuschild,self.childReviewStatus,self.childDescription,self.RCV,self.CytogeneticLocationchild,self.childProteinChange,self.childlist_attr,self.childattributeMconsequence,self.relations,self.childRefElement,self.RecordStatuschildclinvar,self.childReviewStatuclinvars,self.DateLastEvaluatedSignificanceParent,self.childDescriptionclinvars,self.childlist_Origin,self.examplesubmitterSub,self.examplesubmitterDateSub,self.citation_id,self.Inheritance,self.citation_TheRecords,self.RecordStatuschildclinvar,self.childReviewStatuclinvars,self.DateLastEvaluatedSignificanceParent,self.childDescriptionclinvars,self.childlist_Origin,self.examplesubmitterSub,self.examplesubmitterDateSub,self.clinMethod,self.citation_id,self.Inheritance,self.citation_TheRecords,self.SCV,self.AlleleFrequency,self.GMAlleleFrequency,self.childlist_title]
 			data_line=','.join(map(str, data))
-
-
+			json.dump(data_line,self.output_file)
+			self.output_file.write('\n')
 		
 
 
+	
+			#json.dump(self.output_file, data_line)
+			#self.output_file.write('\n')
+
 			
 
 
-			self.output_file.write(data_line+',')	
+			#self.output_file.write(data_line+',')	
 
 			#self.output_file.write('\n')
 		
-			self.output_file.write("clinVar"+' '+str(self.RecordStatuschild)+',')
-			self.output_file.write("clinVar"+' '+str(self.childReviewStatus)+',')
-			self.output_file.write("clinVar"+' '+str(self.childDescription)+',')
-			self.output_file.write(self.RCV+',')
+			#self.output_file.write("clinVar"+' '+str(self.RecordStatuschild)+',')
+			#self.output_file.write("clinVar"+' '+str(self.childReviewStatus)+',')
+			#self.output_file.write("clinVar"+' '+str(self.childDescription)+',')
+			#self.output_file.write(self.RCV+',')
 
 			
 
 
 
-			self.output_file.write(self.CytogeneticLocationchild+',')
-			self.output_file.write("ProteinChange"+' '+str(self.childProteinChange)+',')
-			self.output_file.write("HGVS"+" "+str(self.childlist_attr)+',')
-			self.output_file.write("MolecularCons"+" "+str(self.childattributeMconsequence)+',')
-			self.output_file.write("identifier"+" "+str(self.relations)+',')
-			self.output_file.write("condition-name"+" "+str(self.childRefElement)+',')
+			#self.output_file.write(self.CytogeneticLocationchild+',')
+			#self.output_file.write("ProteinChange"+' '+str(self.childProteinChange)+',')
+			#self.output_file.write("HGVS"+" "+str(self.childlist_attr)+',')
+			#self.output_file.write("MolecularCons"+" "+str(self.childattributeMconsequence)+',')
+			#self.output_file.write("identifier"+" "+str(self.relations)+',')
+			#self.output_file.write("condition-name"+" "+str(self.childRefElement)+',')
 
 
-			self.output_file.write("clinical assertion-Record Satus"+" "+str(self.RecordStatuschildclinvar)+',')
-			self.output_file.write("clinical assertion-Review Satus"+" "+ str(self.childReviewStatuclinvars)+',')
-			self.output_file.write("clinical assertion-Date"+" "+ str(self.DateLastEvaluatedSignificanceParent)+',')
-			self.output_file.write("clinical assertion"+" "+str(self.childDescriptionclinvars)+',')
-			self.output_file.write("clinical assertion"+" " + str(self.childlist_Origin)+',')
-			self.output_file.write("clinical assertion(submitter infor_who)"+" "+ str(self.examplesubmitterSub)+',')
-			self.output_file.write("clinical assertion(submitter infor_date)"+" "+ str(self.examplesubmitterDateSub)+',')
-			self.output_file.write("clinical assertion(method)"+" "+ str(self.clinMethod)+',')
-			self.output_file.write("clinical assertion(citations)"+" "+ str(self.citation_id)+',')
-			self.output_file.write("clinical assertion(conditions-Mode of inheritance)"+" "+ str(self.Inheritance)+',')
-			self.output_file.write("clinical assertion(See all records that cite these PMIDs)"+" "+ str(self.citation_TheRecords)+',')
+			#self.output_file.write("clinical assertion-Record Satus"+" "+str(self.RecordStatuschildclinvar)+',')
+			#self.output_file.write("clinical assertion-Review Satus"+" "+ str(self.childReviewStatuclinvars)+',')
+			#self.output_file.write("clinical assertion-Date"+" "+ str(self.DateLastEvaluatedSignificanceParent)+',')
+			#self.output_file.write("clinical assertion"+" "+str(self.childDescriptionclinvars)+',')
+			#self.output_file.write("clinical assertion"+" " + str(self.childlist_Origin)+',')
+			#self.output_file.write("clinical assertion(submitter infor_who)"+" "+ str(self.examplesubmitterSub)+',')
+			#self.output_file.write("clinical assertion(submitter infor_date)"+" "+ str(self.examplesubmitterDateSub)+',')
+			#self.output_file.write("clinical assertion(method)"+" "+ str(self.clinMethod)+',')
+			#self.output_file.write("clinical assertion(citations)"+" "+ str(self.citation_id)+',')
+			#self.output_file.write("clinical assertion(conditions-Mode of inheritance)"+" "+ str(self.Inheritance)+',')
+			#self.output_file.write("clinical assertion(See all records that cite these PMIDs)"+" "+ str(self.citation_TheRecords)+',')
 
 			
 
-			self.output_file.write(str(self.SCV)+',')
+			#self.output_file.write(str(self.SCV)+',')
 
-			self.output_file.write(str(self.AlleleFrequency)+',')
+			#self.output_file.write(str(self.AlleleFrequency)+',')
 
-			self.output_file.write(str(self.GMAlleleFrequency)+',')
+			#self.output_file.write(str(self.GMAlleleFrequency)+',')
 
 
 
@@ -1463,13 +1426,13 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		
 		
 
-			self.output_file.write(' ')
+			#self.output_file.write(' ')
 
 
-			data=[self.childlist_title]
-			data_line=','.join(map(str, data))
-			self.output_file.write(data_line+',')
-			self.output_file.write('\n')
+			#data=[self.childlist_title]
+			#data_line=','.join(map(str, data))
+			#self.output_file.write(data_line+',')
+			#self.output_file.write('\n')
 
 			
 
@@ -1942,7 +1905,7 @@ if( __name__ =="__main__"):
 
 	
 
-
+    
 
 
 
