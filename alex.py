@@ -16,67 +16,70 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 
 
     def test_1(self, cvs):
-        t = 'ClinVarSet' in cvs
+        '''
+        '''
 
-        if not t:
-            pprint(cvs)
-            a=1/0
+        tests = [
+            "'ClinVarSet' in cvs",
+            "len(cvs['ClinVarSet']) == 1",
+            "'ReferenceClinVarAssertion' in cvs['ClinVarSet'][0]",
+            "len(cvs['ClinVarSet'][0]['ReferenceClinVarAssertion']) == 1",
+            "'ClinVarAssertion' in cvs['ClinVarSet'][0]",
+            "len(cvs['ClinVarSet'][0]['ClinVarAssertion']) == 1",
+        ]
 
-        t = 'ReferenceClinVarAssertion' in cvs['ClinVarSet']
-        if not t:
-            pprint(cvs)
-            a=1/0
+        for test in tests:
+            if not eval(test):
+                message = 'This test failed:\n{}\n'.format(test)
+                pprint(cvs)
+                raise Exception(message)
 
-        t = len(cvs['ClinVarSet']['ReferenceClinVarAssertion']['elements']) == 1
-        if not t:
-            pprint(cvs)
-            a=1/0
+    def get_current(self,):
+        current = self.content
+        for p in self.path:
+            current = current[p[0]][p[1]]
 
-        t = 'ClinVarAssertion' in cvs['ClinVarSet']
-        if not t:
-            pprint(cvs)
-            a=1/0
-
-        t = len(cvs['ClinVarSet']['ClinVarAssertion']['elements']) == 1
-        if not t:
-            pprint(cvs)
-            a=1/0
-
-
-    def ClinVarSet_starts(self, attrs):
-        self.content['##'] = 'ClinVarSet'
-        self.content['attrs'] = attrs
-
- 
-    def ClinVarSet_ends(self, ):
-        pprint(self.content)
-        a=1/0
-
+        return current
 
     def my_element_starts(self, element_name, attrs):
-        current = self.content
-        for x in self.path:
-            current = current[x]
-        
-        #print (current)
-        if not element_name in current:
-            current[element_name] = {
-                'elements': []
-            }
+        '''
 
-        current[element_name]['elements'].append({
-            '##': element_name,
-            'attrs': attrs,
+        {a: {   'attrs': [],
+                'element_1': [],
+                'element_2': [{}, {}, {
+                            'fff_5': []
+                }],
+                'element_3': [],
+                
+            }
+        }
+
+        '''
+        #current = self.content
+        #for x in self.path:
+        #    current = current[x]['children'] # This is a dictionary
+
+        current = self.get_current()
+
+
+        if not element_name in current:
+            current[element_name] = []
+
+        current[element_name].append({
+            'attrs': attrs
         })
 
-        self.path.append(element_name)
+        self.path.append((element_name, len(current[element_name])-1))
+
+        #pprint (self.content)
+
+        #a=1/0
 
     def my_element_ends(self,):
         self.path.pop()
 
     def root_entry_ends(self,):
         #pprint(self.content)
-        #a=1/0
 
         self.root_counter += 1
         if self.root_counter % 1000 == 0:
@@ -147,18 +150,11 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 #            self.ReferenceClinVarAssertion_ends()
 
     def characters(self, content):
-        current = self.content
-        for x in self.path:
-            current = current[x]
-
+        current = self.get_current()
 
         if content.strip():
-
-            current_text = ''
-            if 'TEXT' in current['elements'][-1]:
-                current_text = current['elements'][-1]['TEXT']
-
-            current['elements'][-1]['TEXT'] = current_text + content.strip()
+            current_text = current.get('TEXT', '')
+            current['TEXT'] = current_text + content.strip()
 
 
 if __name__ == '__main__':
