@@ -14,6 +14,20 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         self.path = []
         self.root_counter = 0
 
+    def build_url(self, entry):
+        Acc =  entry['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinVarAccession'][0]['attrs']['Acc']
+
+        url_format = 'https://www.ncbi.nlm.nih.gov/clinvar/{Acc}/'
+
+        return url_format.format(Acc=Acc)
+
+    def build_variation_url(self, entry):
+
+        measure_set_id = entry['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['attrs']['ID']
+        url_format = 'https://www.ncbi.nlm.nih.gov/clinvar/variation/{measure_set_id}/'
+
+        return url_format.format(measure_set_id=measure_set_id)
+
 
     def test_1(self, cvs):
         '''
@@ -25,7 +39,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
             "'ReferenceClinVarAssertion' in cvs['ClinVarSet'][0]",
             "len(cvs['ClinVarSet'][0]['ReferenceClinVarAssertion']) == 1",
             "'ClinVarAssertion' in cvs['ClinVarSet'][0]",
-            "len(cvs['ClinVarSet'][0]['ClinVarAssertion']) == 1",
+            #"len(cvs['ClinVarSet'][0]['ClinVarAssertion']) == 1",  # A ClinVarSet can have MANY ClinVarAssertions. For example: https://www.ncbi.nlm.nih.gov/clinvar/RCV000146116/ has 3 accessions
         ]
 
         for test in tests:
@@ -81,6 +95,10 @@ class ClinVarHandler( xml.sax.ContentHandler ):
     def root_entry_ends(self,):
         #pprint(self.content)
 
+        if False:
+            print ('ClinVarSet URL:', self.build_url(self.content))
+            print ('Variation URL:', self.build_variation_url(self.content))
+
         self.root_counter += 1
         if self.root_counter % 1000 == 0:
             print ('ClinVarSet entities parsed:', self.root_counter)
@@ -128,9 +146,10 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 #        elif tag == 'ReferenceClinVarAssertion':
 #            self.ReferenceClinVarAssertion_starts(attrs)
 
-
-    # Call when an elements ends
     def endElement(self, tag):
+        '''
+        Call when an elements ends
+        '''
 
         if tag == 'ReleaseSet':
             return
@@ -158,6 +177,17 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 
 
 if __name__ == '__main__':
+
+    '''
+<ClinVarSet ID="18522034">
+  <RecordStatus>current</RecordStatus>
+  <Title>NC_000006.10:g.(160991083_161362841)_(170663087_170899992)del AND multiple conditions</Title>
+  <ReferenceClinVarAssertion DateCreated="2014-06-13" DateLastUpdated="2017-04-05" ID="286872">
+    <ClinVarAccession Acc="RCV000122723" Version="1" Type="RCV" DateUpdated="2017-04-05"/>
+
+
+    '''
+
     filename = '/home/maryastr/clinVar/clinVarCode/ClinVarFullRelease_2018-07.xml'
     parser = xml.sax.make_parser()
     Handler = ClinVarHandler()
