@@ -1,4 +1,3 @@
-
 import xml.sax
 import gzip
 import xml.sax.saxutils as saxutils
@@ -12,6 +11,8 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.CurrentData=""
 		self.ClinaVarsetID=""
 		self.data_line=[]
+		self.Title=[]
+		self.childlist_title=""
 		self.output_file=open(output_filename,'w')
 
 	def startElement(self,tag,attributes):
@@ -19,20 +20,29 @@ class ClinVarHandler( xml.sax.ContentHandler):
 		self.CurrentData=tag
 
 		if tag=="ClinVarSet":
+			self.Title=[]
 			self.ClinaVarsetID=attributes.get('ID')
 	def endElement (self,tag):
 
+		if self.CurrentData=="Title":
+
+			self.childlist_title = ''.join(map(str,self.Title))
+
 		if tag=="ClinVarSet":
-			print("ID clinVar",self.ClinaVarsetID)
-			self.data_line.append({"ID clinVar":self.ClinaVarsetID})
+			print("title",self.childlist_title)
+			self.data_line.append({"ID clinVar":self.ClinaVarsetID,"Title":self.childlist_title})
 
 		self.CurrentData=""
 
 	def __del__(self):
-		self.output_file.write(json.dumps(self.data_line,sort_keys=False, indent=2))
+		json.dump(self.data_line, self.output_file, indent=2)
+		
 
 	def characters(self,content):
-		pass
+		if self.CurrentData=="Title":
+
+			self.Title.append(saxutils.unescape(content))
+		
 	
 
 
@@ -48,3 +58,7 @@ if( __name__ =="__main__"):
 	f=gzip.open("/home/maryastr/clinVar/clinVarCode/ClinVarFullRelease_2018-07.xml.gz")
 	parser.parse(f)
 	f.close()
+	
+	
+	
+	
