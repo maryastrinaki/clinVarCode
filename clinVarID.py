@@ -1,3 +1,4 @@
+
 import xml.sax
 import gzip
 import xml.sax.saxutils as saxutils
@@ -23,8 +24,7 @@ class ClinVarHandler( xml.sax.ContentHandler):
 
 		if tag=="ClinVarSet":
 			print("ID clinVar",self.ClinaVarsetID)
-			
-		self.data_line.append({"ID clinVar":self.ClinaVarsetID})
+			self.data_line.append({"ID clinVar":self.ClinaVarsetID})
 
 		self.CurrentData=""
 
