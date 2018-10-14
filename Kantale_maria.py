@@ -67,6 +67,7 @@ def consumer():
         assertion=[]
         Cytogenic_Loc=[]
         content = (yield)
+        
 
         for i in range(len(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'])):
 
@@ -325,7 +326,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 
 if( __name__ =="__main__"):
 
-    filename = '/home/maryastr/clinVar/clinVarCode/test.xml'
+    filename = '/home/maryastr/clinVar/clinVarCode/test2.xml'
     parser = xml.sax.make_parser()
     Handler = ClinVarHandler(consumer())
     parser.setContentHandler( Handler )
