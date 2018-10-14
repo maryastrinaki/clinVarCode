@@ -3,9 +3,11 @@ import json
 import xml.sax
 
 
-def pprint(d):
+def pprint(ofile,d):
+
 
     print (json.dumps(d, indent=4))
+    ofile.write(json.dumps(d, indent=4))
 
 #@asyncio.coroutine
 def consumer():
@@ -23,6 +25,17 @@ def consumer():
     strand=[]
     HGVS=[]
     Cytogenic_Loc=[]
+    submitter=[]
+    submitterDate=[]
+    Acc=[]
+    Assertion_RecordStatus=[]
+    DateEvaluated=[]
+    AssertionReviewStatus=[]
+    AssertionDescription=[]
+    origin=[]
+    AssertionMethod=[]
+    assertion=[]
+    ofile = open('patata.json','w')
 
 
 
@@ -42,6 +55,17 @@ def consumer():
         stop=[]
         strand=[]
         HGVS=[]
+        submitter=[]
+        submitterDate=[]
+        Acc=[]
+        Assertion_RecordStatus=[]
+        DateEvaluated=[]
+        AssertionReviewStatus=[]
+        AssertionDescription=[]
+        origin=[]
+        AssertionMethod=[]
+        assertion=[]
+        Cytogenic_Loc=[]
         content = (yield)
 
         for i in range(len(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'])):
@@ -88,17 +112,68 @@ def consumer():
         for i in range(len( content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'])):
           if "HGVS" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['attrs']['Type']:
             HGVS.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['TEXT'])
-        Cytogenic_Loc.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]["CytogeneticLocation"][0]["TEXT"])
+        if "CytogeneticLocation" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+            Cytogenic_Loc.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]["CytogeneticLocation"][0]["TEXT"])
+        elif "CytogeneticLocation" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+            Cytogenic_Loc.append("Nan")
+            
+        for i in range(len(content['ClinVarSet'][0]['ClinVarAssertion']) ):
+            submitter.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']['submitter'])
+            submitterDate.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']['submitterDate'])
+            Acc.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarAccession'][0]['attrs']['Acc'])
+            Assertion_RecordStatus.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['RecordStatus'][0]['TEXT'])
+            if "DateLastEvaluated" in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']:
+                DateEvaluated.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']['DateLastEvaluated'])
+            elif "DateLastEvaluated" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']:
+                DateEvaluated.append('Nan')
+            AssertionReviewStatus.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['ReviewStatus'][0]['TEXT'])
+            AssertionDescription.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['Description'][0]['TEXT'])
+            origin.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ObservedIn'][0]['Sample'][0]['Origin'][0]['TEXT'])
+            AssertionMethod.append(content['ClinVarSet'][0]['ClinVarAssertion'][0]['ObservedIn'][0]['Method'][0]['MethodType'][0]['TEXT'])
+
+            if "Assertion" in content['ClinVarSet'][0]['ClinVarAssertion'][i]:
+
+                assertion.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]["Assertion"][0]["attrs"]["Type"])
+
+            elif "Assertion" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]:
+                assertion.append("nan")
+      
+
+
         
+        #pprint(content['ClinVarSet'][0]['ClinVarAssertion'][0]['ClinVarSubmissionID'][0]['attrs']['submitterDate'])
+        #pprint(content['ClinVarSet'][0]['ClinVarAssertion'][0]['ClinVarAccession'][0]['attrs']['Acc'])
+        #pprint(content['ClinVarSet'][0]['ClinVarAssertion'][0]['RecordStatus'][0]['TEXT'])
+
+
+            
+
+
+
+
+
+
+
+
+        
+
+       
+
+            
+       
+
+       
+
         recordList.append({"ClinVar Id":content['ClinVarSet'][0]['attrs']['ID'],"Record status":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['RecordStatus'][0]['TEXT'],"Title":content['ClinVarSet'][0]['Title'][0]['TEXT'],"Review status":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinicalSignificance'][0]['ReviewStatus'][0]['TEXT'],"clinical significance":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinicalSignificance'][0]['Description'][0]['TEXT'],"Accession":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinVarAccession'][0]['attrs']['Acc'],"variant type":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['attrs']['Type'],
 
             "Assembly":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['Assembly'],"chr":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['Chr'],"outerstart": outerstart,"innerstart":innerstart,
             "innerstop":innerstop,"outerstop":outerstop,"displaystart":displaystart,"displaystop":displaystop,"start":start,"stop":stop,"variantLength":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['variantLength'],
-            "strand":strand,"HGVS":HGVS,"Cytogenetic Location":Cytogenic_Loc
+            "strand":strand,"HGVS":HGVS,"Cytogenetic Location":Cytogenic_Loc,"submitter(assertion)":submitter,"submission date(assertion)":submitterDate,"record status(assertion)":Assertion_RecordStatus,'Date Last Evaluate(assertion)':DateEvaluated,'review status(assertion)':AssertionReviewStatus,'Description(Assertion)':AssertionDescription,"Origin(Assertion)":origin,"Method(Assertion)":AssertionMethod,"Assertion":assertion
 
             })
 
-        pprint(recordList)
+
+        pprint(ofile, recordList)
 
 
 
@@ -117,6 +192,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         self.root_counter = 0
         self.consumer = consumer
         self.consumer.send(None)
+        #self.ofile = open('patata','w')
        
    
 
@@ -151,7 +227,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         for test in tests:
             if not eval(test):
                 message = 'This test failed:\n{}\n'.format(test)
-                pprint(cvs)
+                pprint(ofile, cvs)
                 raise Exception(message)
 
     def get_current(self,):
@@ -249,7 +325,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 
 if( __name__ =="__main__"):
 
-    filename = '/home/maryastr/clinVar/clinVarCode/test2.xml'
+    filename = '/home/maryastr/clinVar/clinVarCode/test.xml'
     parser = xml.sax.make_parser()
     Handler = ClinVarHandler(consumer())
     parser.setContentHandler( Handler )
