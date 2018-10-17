@@ -1,18 +1,24 @@
 #import asyncio
 import json
 import xml.sax
+import itertools
+
 
 
 def pprint(ofile,d):
+#def pprint(d):
 
 
     print (json.dumps(d, indent=4))
     ofile.write(json.dumps(d, indent=4))
 
 
+
+
+
 #@asyncio.coroutine
 def consumer():
-
+    
     recordList=[]
     outerstart=[]
     outerstop=[]
@@ -40,7 +46,16 @@ def consumer():
     assembly=[]
     variantLength=[]
     v_type=[]
-    ofile = open('patata.json','w')
+    n_change=[]
+    prefered_name=[]
+    condition=[]
+    identifier=[]
+    globalalleleFreq=[]
+    GO_ESP=[]
+    proteinChange=[]
+    
+    ofile = open('skata.json','w')
+
 
 
 
@@ -49,92 +64,203 @@ def consumer():
     '''
 
     while True:
-        outerstart=[]
-        outerstop=[]
-        strand=[]
-        innerstart=[]
-        innerstop=[]
-        displaystart=[]
-        displaystop=[]
-        start=[]
-        stop=[]
-        strand=[]
-        HGVS=[]
-        submitter=[]
-        submitterDate=[]
-        Acc=[]
-        Assertion_RecordStatus=[]
-        DateEvaluated=[]
-        AssertionReviewStatus=[]
-        AssertionDescription=[]
-        origin=[]
-        AssertionMethod=[]
-        assertion=[]
-        Cytogenic_Loc=[]
-        chromosome=[]
-        assembly=[]
-        variantLength=[]
-        v_type=[]
-        content = (yield)
+        try:
+            outerstart=[]
+            outerstop=[]
+            strand=[]
+            innerstart=[]
+            innerstop=[]
+            displaystart=[]
+            displaystop=[]
+            start=[]
+            stop=[]
+            strand=[]
+            HGVS=[]
+            submitter=[]
+            submitterDate=[]
+            Acc=[]
+            Assertion_RecordStatus=[]
+            DateEvaluated=[]
+            AssertionReviewStatus=[]
+            AssertionDescription=[]
+            origin=[]
+            AssertionMethod=[]
+            assertion=[]
+            Cytogenic_Loc=[]
+            chromosome=[]
+            assembly=[]
+            variantLength=[]
+            v_type=[]
+            n_change=[]
+            prefered_name=[]
+            condition=[]
+            identifier=[]
+            globalalleleFreq=[]
+            GO_ESP=[]
+            proteinChange=[]
+        #recordList=[]
+            content = (yield)
 
 #NOT all sequence location https://www.ncbi.nlm.nih.gov/clinvar/RCV000001859/
 #Not all HGVS https://www.ncbi.nlm.nih.gov/clinvar/RCV000003355/
 
-        if "MeasureSet" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]:
+            if "TraitSet" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]:
+
+                for x in range(len( content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]["TraitSet"][0]["Trait"])):
+                    condition.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]["TraitSet"][0]["Trait"][x]["Name"][0]["ElementValue"][0]["TEXT"])
+                    if "XRef" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]["TraitSet"][0]["Trait"][x]:
+                        identifier.append({"DB":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]["TraitSet"][0]["Trait"][x]["XRef"][0]["attrs"]["DB"],"ID":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]["TraitSet"][0]["Trait"][x]["XRef"][0]["attrs"]["ID"]})
+                    elif "XRef" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]["TraitSet"][0]["Trait"][x]:
+                        identifier.append("Nan")
+            elif "TraitSet" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]:
+
+                condition.append("Nan")
+                identifier.append("Nan")
+
+            if "MeasureSet" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]:
+
+                if "Name" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                    prefered_name.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]["Name"][0]["ElementValue"][0]["TEXT"])
+                elif  "Name" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                    prefered_name.append("Nan")
 
 
-            if "SequenceLocation" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
-                chromosome.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['Chr'])
+                if "SequenceLocation" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                    chromosome.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['Chr'])
 
-                assembly.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['Assembly'])
+                    assembly.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['Assembly'])
 
-                if "variantLength" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
-                    variantLength.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['variantLength'])
-                elif "variantLength" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                    if "variantLength" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                        variantLength.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['variantLength'])
+                    elif "variantLength" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                        variantLength.append("Nan")
+
+
+                    for i in range(len(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'])):
+
+                        if "outerStart" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            outerstart.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['outerStart'])
+                        elif "outerStart" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            outerstart.append("Nan")
+
+                        if "outerStop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            outerstop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['outerStop'])
+                        elif "outerStop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            outerstop.append("Nan")
+
+                        if "innerStart" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            innerstart.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['innerStart'])
+                        elif "innerStart" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            innerstart.append("Nan")
+                        if "innerStop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            innerstop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['innerStop'])
+                        elif "innerStop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            innerstop.append('Nan')
+                        if "display_start" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            displaystart.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['display_start'])
+                        elif "display_start" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            displaystart.append('Nan')
+                        if "display_stop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            displaystop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['display_stop'])
+                        elif "display_stop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
+                            displaystop.append('Nan')
+                        if "start" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                            start.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['start'])
+                        elif "start" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                            start.append('Nan')
+                        if "stop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                            stop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['stop'])
+                        elif "stop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                            stop.append('Nan')
+                        if "strand" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                            strand.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['strand'])
+                        elif "strand" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
+                            strand.append("Nan")
+                elif  "SequenceLocation" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                    innerstart.append("Nan")
+                    innerstop.append("Nan")
+                    displaystart.append("Nan")
+                    displaystop.append("Nan")
+                    start.append("Nan")
+                    stop.append("Nan")
+                    strand.append("Nan")
+                    assembly.append("Nan")
+                    chromosome.append("Nan")
                     variantLength.append("Nan")
 
+       
 
-                for i in range(len(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'])):
+                if "AttributeSet" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
 
-                    if "outerStart" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        outerstart.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['outerStart'])
-                    elif "outerStart" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        outerstart.append("Nan")
+                    for i in range(len( content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'])):
+                        if "HGVS" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['attrs']['Type']:
+                            HGVS.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['TEXT'])
+                
+                        if "GlobalMinorAlleleFrequency" == content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['attrs']['Type']:
+                            globalalleleFreq.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['TEXT'])
+                        if "AlleleFrequency"== content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['attrs']['Type']:
+                            GO_ESP.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['TEXT'])
+                        if "ProteinChange" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]["attrs"]["Type"]:
+                            proteinChange.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]["TEXT"])
+                elif "AttributeSet" not  in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                    HGVS.append("Nan")
+                    globalalleleFreq.append("nan")
+                    GO_ESP.append("nan")
+                    proteinChange.append("nan")
 
-                    if "outerStop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        outerstop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['outerStop'])
-                    elif "outerStop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        outerstop.append("Nan")
+        
+                if "CytogeneticLocation" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                    Cytogenic_Loc.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]["CytogeneticLocation"][0]["TEXT"])
+                elif "CytogeneticLocation" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                    Cytogenic_Loc.append("Nan")
 
-                    if "innerStart" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        innerstart.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['innerStart'])
-                    elif "innerStart" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        innerstart.append("Nan")
-                    if "innerStop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        innerstop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['innerStop'])
-                    elif "innerStop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        innerstop.append('Nan')
-                    if "display_start" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        displaystart.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['display_start'])
-                    elif "display_start" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        displaystart.append('Nan')
-                    if "display_stop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        displaystop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']['display_stop'])
-                    elif "display_stop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][i]['attrs']:
-                        displaystop.append('Nan')
-                    if "start" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
-                        start.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['start'])
-                    elif "start" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
-                        start.append('Nan')
-                    if "stop" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
-                        stop.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['stop'])
-                    elif "stop" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
-                        stop.append('Nan')
-                    if "strand" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
-                        strand.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['strand'])
-                    elif "strand" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']:
-                        strand.append("Nan")
-            elif  "SequenceLocation" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+                if "nucleotide change" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['attrs']['Type']:
+                    n_change.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['TEXT'])
+
+                elif "nucleotide change" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['attrs']['Type']:
+                    n_change.append("Nan")
+
+
+        
+            
+                for i in range(len(content['ClinVarSet'][0]['ClinVarAssertion']) ):
+                    submitter.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']['submitter'])
+                    if "submitterDate" in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']:
+                        submitterDate.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']['submitterDate'])
+                    elif "submitterDate" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']:
+                        submitterDate.append("nan")
+
+                    Acc.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarAccession'][0]['attrs']['Acc'])
+                    Assertion_RecordStatus.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['RecordStatus'][0]['TEXT'])
+                    if "DateLastEvaluated" in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']:
+                        DateEvaluated.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']['DateLastEvaluated'])
+                    elif "DateLastEvaluated" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']:
+                        DateEvaluated.append('Nan')
+                    AssertionReviewStatus.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['ReviewStatus'][0]['TEXT'])
+                    if "Description" in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]:
+                        AssertionDescription.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['Description'][0]['TEXT'])
+                    elif "Description" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]:
+                        AssertionDescription.append("nan")
+                    origin.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ObservedIn'][0]['Sample'][0]['Origin'][0]['TEXT'])
+                    AssertionMethod.append(content['ClinVarSet'][0]['ClinVarAssertion'][0]['ObservedIn'][0]['Method'][0]['MethodType'][0]['TEXT'])
+
+                    if "Assertion" in content['ClinVarSet'][0]['ClinVarAssertion'][i]:
+
+                        assertion.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]["Assertion"][0]["attrs"]["Type"])
+
+                    elif "Assertion" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]:
+                        assertion.append("nan")
+
+                v_type.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['attrs']['Type'])
+
+
+            elif "MeasureSet" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]:
+                v_type.append("Nan")
+                Cytogenic_Loc.append("Nan")
+                HGVS.append("Nan")
+                chromosome.append("nan")
+                assembly.append("nan")
+                variantLength.append("nan")
                 innerstart.append("Nan")
                 innerstop.append("Nan")
                 displaystart.append("Nan")
@@ -146,86 +272,60 @@ def consumer():
                 chromosome.append("Nan")
                 variantLength.append("Nan")
 
+
+
+
+        
+        #pprint(content['ClinVarSet'][0]['ClinVarAssertion'][0]['ClinVarSubmissionID'][0]['attrs']['submitterDate'])
+        #pprint(content['ClinVarSet'][0]['ClinVarAssertion'][0]['ClinVarAccession'][0]['attrs']['Acc'])
+        #pprint(content['ClinVarSet'][0]['ClinVarAssertion'][0]['RecordStatus'][0]['TEXT'])
+
+  
+
        
 
-            if "AttributeSet" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
+            recordList.append({"ClinVar Id":content['ClinVarSet'][0]['attrs']['ID'],"Record status":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['RecordStatus'][0]['TEXT'],"Title":content['ClinVarSet'][0]['Title'][0]['TEXT'],"Review status":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinicalSignificance'][0]['ReviewStatus'][0]['TEXT'],"clinical significance":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinicalSignificance'][0]['Description'][0]['TEXT'],"Accession":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinVarAccession'][0]['attrs']['Acc'],"variant type":v_type,
 
-                for i in range(len( content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'])):
-                    if "HGVS" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['attrs']['Type']:
-                        HGVS.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['AttributeSet'][i]['Attribute'][0]['TEXT'])
-            elif "AttributeSet" not  in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
-                HGVS.append("Nan")
-        
-            if "CytogeneticLocation" in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
-                Cytogenic_Loc.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]["CytogeneticLocation"][0]["TEXT"])
-            elif "CytogeneticLocation" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]:
-                Cytogenic_Loc.append("Nan")
+                "Assembly":assembly,"chr":chromosome,"outerstart": outerstart,"innerstart":innerstart,
+                "innerstop":innerstop,"outerstop":outerstop,"displaystart":displaystart,"displaystop":displaystop,"start":start,"stop":stop,"variantLength":variantLength,
+                "strand":strand,"prefered name":prefered_name,"HGVS":HGVS,"Cytogenetic Location":Cytogenic_Loc,"nucleotide change":n_change,"Protein Change":proteinChange,"condition(s)":condition,"Identifier":identifier,"Global Allele Freguency ":globalalleleFreq,"GO_ESP":GO_ESP,"submitter(assertion)":submitter,"submission date(assertion)":submitterDate,"record status(assertion)":Assertion_RecordStatus,'Date Last Evaluate(assertion)':DateEvaluated,'review status(assertion)':AssertionReviewStatus,'Description(Assertion)':AssertionDescription,"Origin(Assertion)":origin,"Method(Assertion)":AssertionMethod,"Assertion":assertion
 
-        
-            
-            for i in range(len(content['ClinVarSet'][0]['ClinVarAssertion']) ):
-                submitter.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']['submitter'])
-                if "submitterDate" in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']:
-                    submitterDate.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']['submitterDate'])
-                elif "submitterDate" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarSubmissionID'][0]['attrs']:
-                    submitterDate.append("nan")
+                })
 
-                Acc.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinVarAccession'][0]['attrs']['Acc'])
-                Assertion_RecordStatus.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['RecordStatus'][0]['TEXT'])
-                if "DateLastEvaluated" in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']:
-                    DateEvaluated.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']['DateLastEvaluated'])
-                elif "DateLastEvaluated" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['attrs']:
-                    DateEvaluated.append('Nan')
-                AssertionReviewStatus.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['ReviewStatus'][0]['TEXT'])
-                if "Description" in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]:
-                    AssertionDescription.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]['Description'][0]['TEXT'])
-                elif "Description" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]['ClinicalSignificance'][0]:
-                    AssertionDescription.append("nan")
-                origin.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]['ObservedIn'][0]['Sample'][0]['Origin'][0]['TEXT'])
-                AssertionMethod.append(content['ClinVarSet'][0]['ClinVarAssertion'][0]['ObservedIn'][0]['Method'][0]['MethodType'][0]['TEXT'])
-
-                if "Assertion" in content['ClinVarSet'][0]['ClinVarAssertion'][i]:
-
-                    assertion.append(content['ClinVarSet'][0]['ClinVarAssertion'][i]["Assertion"][0]["attrs"]["Type"])
-
-                elif "Assertion" not in content['ClinVarSet'][0]['ClinVarAssertion'][i]:
-                    assertion.append("nan")
-
-            v_type.append(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['attrs']['Type'])
-
-
-        elif "MeasureSet" not in content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]:
-            v_type.append("Nan")
-            Cytogenic_Loc.append("Nan")
-            HGVS.append("Nan")
-            chromosome.append("nan")
-            assembly.append("nan")
-            variantLength.append("nan")
-            innerstart.append("Nan")
-            innerstop.append("Nan")
-            displaystart.append("Nan")
-            displaystop.append("Nan")
-            start.append("Nan")
-            stop.append("Nan")
-            strand.append("Nan")
-            assembly.append("Nan")
-            chromosome.append("Nan")
-            variantLength.append("Nan")
-
-
-        recordList.append({"ClinVar Id":content['ClinVarSet'][0]['attrs']['ID'],"Record status":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['RecordStatus'][0]['TEXT'],"Title":content['ClinVarSet'][0]['Title'][0]['TEXT'],"Review status":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinicalSignificance'][0]['ReviewStatus'][0]['TEXT'],"clinical significance":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinicalSignificance'][0]['Description'][0]['TEXT'],"Accession":content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinVarAccession'][0]['attrs']['Acc'],"variant type":v_type,
-
-            "Assembly":assembly,"chr":chromosome,"outerstart": outerstart,"innerstart":innerstart,
-            "innerstop":innerstop,"outerstop":outerstop,"displaystart":displaystart,"displaystop":displaystop,"start":start,"stop":stop,"variantLength":variantLength,
-            "strand":strand,"HGVS":HGVS,"Cytogenetic Location":Cytogenic_Loc,"submitter(assertion)":submitter,"submission date(assertion)":submitterDate,"record status(assertion)":Assertion_RecordStatus,'Date Last Evaluate(assertion)':DateEvaluated,'review status(assertion)':AssertionReviewStatus,'Description(Assertion)':AssertionDescription,"Origin(Assertion)":origin,"Method(Assertion)":AssertionMethod,"Assertion":assertion
-
-            })
-
-
-        pprint(ofile, recordList)
-
+            #pprint (content)
 
      
+
+        #pprint(recordList)
+    #pprint(recordList)
+
+
+    
+
+     
+
+
+        #xrec = recordList.copy()
+    #return recordList
+        except GeneratorExit:
+        #finally:
+            pprint(ofile, recordList)
+
+
+
+
+      #  pprint(content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['MeasureSet'][0]['Measure'][0]['SequenceLocation'][0]['attrs']['Strand'])
+
+      
+
+      
+
+    
+        
+        
+
+
+
 class ClinVarHandler( xml.sax.ContentHandler ):
     def __init__(self, consumer):
         self.content = {}
@@ -233,6 +333,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         self.root_counter = 0
         self.consumer = consumer
         self.consumer.send(None)
+       
         #self.ofile = open('patata','w')
        
    
@@ -353,6 +454,12 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 
         if tag == 'ClinVarSet':
             self.root_entry_ends()
+
+
+
+
+
+
             
 
 
@@ -366,7 +473,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 
 if( __name__ =="__main__"):
 
-    filename = '/home/maryastr/clinVar/clinVarCode/ClinVarFullRelease_2018-07.xml'
+    filename = '/home/maryastr/clinVar/clinVarCode/final/test.xml'
     parser = xml.sax.make_parser()
     Handler = ClinVarHandler(consumer())
     parser.setContentHandler( Handler )
