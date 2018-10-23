@@ -169,9 +169,17 @@ class ClinVarHandler( xml.sax.ContentHandler ):
             return
 
         assert len(ClinVarAssertion[0]['ObservedIn']) == 1
-        assert len(ClinVarAssertion[0]['ObservedIn'][0]['Method']) == 1
-        assert len(ClinVarAssertion[0]['ObservedIn'][0]['Method'][0]['MethodType']) == 1
-        collection_method = ClinVarAssertion[0]['ObservedIn'][0]['Method'][0]['MethodType'][0]['TEXT']
+
+        assert len(ClinVarAssertion[0]['ObservedIn'][0]['Method']) > 0
+
+        collection_methods = []
+        for Method in ClinVarAssertion[0]['ObservedIn'][0]['Method']:
+
+            #assert len(ClinVarAssertion[0]['ObservedIn'][0]['Method']) == 1
+            assert len(ClinVarAssertion[0]['ObservedIn'][0]['Method'][0]['MethodType']) == 1
+            collection_method = ClinVarAssertion[0]['ObservedIn'][0]['Method'][0]['MethodType'][0]['TEXT']
+            collection_methods.append(collection_method)
+        collection_method = ' / '.join(collection_methods)
 
         pubmed_ids = set()
         for ObservedData in ClinVarAssertion[0]['ObservedIn'][0]['ObservedData']:
@@ -266,9 +274,12 @@ class ClinVarHandler( xml.sax.ContentHandler ):
             'no assertion criteria provided': 0,
             'no assertioncriteria provided': 0,
             'noassertion criteria provided': 0,
+            'no assertion criteriaprovided': 0,
             'no assertion provided': 0,
             'no assertion for the individual variant': 0,
             'criteria provided, single submitter': 1,
+            'criteriaprovided, single submitter': 1,
+            'criteria provided, singlesubmitter': 1,
             'criteria provided, conflicting interpretations': 1,
             'criteria provided, multiple submitters, no conflicts': 2,
             'reviewed by expert panel': 3,
@@ -420,6 +431,10 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 if __name__ == '__main__':
 
     '''
+
+    Run with:
+
+
 <ClinVarSet ID="18522034">
   <RecordStatus>current</RecordStatus>
   <Title>NC_000006.10:g.(160991083_161362841)_(170663087_170899992)del AND multiple conditions</Title>
