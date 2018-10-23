@@ -15,6 +15,11 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         self.content = {}
         self.path = []
         self.root_counter = 0
+        self.errors = {
+            'more than one ObservedIn': 0,
+            'more than one ClinVarAssertion': 0,
+            'more than one length_one_grch47': 0,
+        }
 
     def build_url(self, entry):
         Acc =  entry['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]['ClinVarAccession'][0]['attrs']['Acc']
@@ -32,6 +37,9 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         url_format = 'https://www.ncbi.nlm.nih.gov/clinvar/variation/{measure_set_id}/'
 
         return url_format.format(measure_set_id=measure_set_id)
+
+    def print_variation_url(self, entry=None):
+        print (self.build_variation_url(entry))
 
 
     def test_1(self, cvs):
@@ -61,6 +69,9 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         assert (len(self.content)) == 1
         assert len(self.content['ClinVarSet'][0]['ReferenceClinVarAssertion']) == 1
         ReferenceClinVarAssertion = self.content['ClinVarSet'][0]['ReferenceClinVarAssertion'][0]
+
+        if not 'MeasureSet' in ReferenceClinVarAssertion:
+            return
 
         assert len(ReferenceClinVarAssertion['MeasureSet']) == 1
 
@@ -116,6 +127,9 @@ class ClinVarHandler( xml.sax.ContentHandler ):
             #print ('Could not find in GRCh37. Return')
             return
 
+        if length_one_grch47 > 1:
+            self.errors['more than one length_one_grch47'] += 1
+            return 
         assert length_one_grch47 == 1
         #print (json.dumps(self.content, indent=4))
         #a=1/0
@@ -127,6 +141,10 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         #print (self.build_variation_url(self.content))
 
         ClinVarAssertion = self.content['ClinVarSet'][0]['ClinVarAssertion']
+        if len(ClinVarAssertion) > 1:
+            self.errors['more than one ClinVarAssertion'] += 1
+            return
+
         assert len(ClinVarAssertion) == 1
         assert len(ClinVarAssertion[0]['ClinicalSignificance']) == 1
         assert len(ClinVarAssertion[0]['ClinicalSignificance'][0]['Description']) == 1
@@ -144,10 +162,11 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         review_status = ClinVarAssertion[0]['ClinicalSignificance'][0]['ReviewStatus'][0]['TEXT']
 
         if len(ClinVarAssertion[0]['ObservedIn']) != 1:
-            print (len(ClinVarAssertion[0]['ObservedIn']))
-            pprint(ClinVarAssertion[0]['ObservedIn'])
-            print (self.build_variation_url())
-            a=1/0
+            #print (len(ClinVarAssertion[0]['ObservedIn']))
+            #pprint(ClinVarAssertion[0]['ObservedIn'])
+            #print (self.build_variation_url())
+            self.errors['more than one ObservedIn'] += 1
+            return
 
         assert len(ClinVarAssertion[0]['ObservedIn']) == 1
         assert len(ClinVarAssertion[0]['ObservedIn'][0]['Method']) == 1
@@ -194,13 +213,27 @@ class ClinVarHandler( xml.sax.ContentHandler ):
 
                 #Access the MeasureSet from ReferenceClinVarAssertion
                 assert len(ReferenceClinVarAssertion['TraitSet']) == 1
-                assert len(ReferenceClinVarAssertion['TraitSet'][0]['Trait']) == 1
-                assert len(ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]['Name']) == 1
-                assert len(ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]['Name'][0]['ElementValue']) == 1
-                Condition = ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]['Name'][0]['ElementValue'][0]['TEXT']
 
-                if 'XRef' in ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]:
-                    Condition += '[' + '|'.join(['{}({})'.format(XRef['attrs']['DB'], XRef['attrs']['ID']) for XRef in ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]['XRef']]) + ']'
+                assert len(ReferenceClinVarAssertion['TraitSet'][0]['Trait']) > 0
+
+                Condition_3 = []
+                for reference_trait in ReferenceClinVarAssertion['TraitSet'][0]['Trait']:
+
+ 
+                    Condition_1 = []
+                    for name in ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]['Name']:
+
+                        assert len(name['ElementValue']) == 1
+                        Condition_2 = name['ElementValue'][0]['TEXT']
+
+                        if 'XRef' in ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]:
+                            Condition_2 += '[' + '|'.join(['{}({})'.format(XRef['attrs']['DB'], XRef['attrs']['ID']) for XRef in ReferenceClinVarAssertion['TraitSet'][0]['Trait'][0]['XRef']]) + ']'
+                        Condition_1.append(Condition_2)
+                    Condition_1 = ' - '.join(Condition_1)
+                    Condition_3.append(Condition_1)
+                Condition_3 = ' / '.join(Condition_3)
+                Condition = Condition_3
+
 
 
             else:
@@ -227,8 +260,12 @@ class ClinVarHandler( xml.sax.ContentHandler ):
         #print (json.dumps(ClinVarAssertion[0], indent=4))
         #print (ClinVarAssertion[0]['ClinicalSignificance'][0])
 
+        # https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/
+
         stars = {
             'no assertion criteria provided': 0,
+            'no assertioncriteria provided': 0,
+            'noassertion criteria provided': 0,
             'no assertion provided': 0,
             'no assertion for the individual variant': 0,
             'criteria provided, single submitter': 1,
@@ -255,8 +292,7 @@ class ClinVarHandler( xml.sax.ContentHandler ):
             print (stars_given)
 
 
-        # https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/
-
+        
 
         
 
